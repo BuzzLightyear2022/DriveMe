@@ -15,7 +15,7 @@ export class ContextmenuHandler {
                 submenu: [
                     {
                         label: "新規予約",
-                        click: () => WindowHandler.createHandleReservationWindow({ crudAction: "create" })
+                        click: () => WindowHandler.createReservationHandlerWindow({ crudAction: "create" })
                     },
                     {
                         label: "予約一覧"
@@ -33,7 +33,7 @@ export class ContextmenuHandler {
                     },
                     {
                         label: "車両新規登録",
-                        click: () => WindowHandler.createInsertVehicleAttributesWindow()
+                        click: () => WindowHandler.createRentalcarHandlerWindow({})
                     }
                 ]
             },
@@ -56,13 +56,13 @@ export class ContextmenuHandler {
                 {
                     label: "ステータス",
                     click: async () => {
-                        WindowHandler.createStatusOfRentalCarHandlerWindow({ rentalCarId: rentalCarId });
+                        WindowHandler.createStatusOfRentalcarHandlerWindow({ rentalcarId: rentalCarId });
                     }
                 },
                 {
                     label: "新規予約",
                     click: async () => {
-                        WindowHandler.createHandleReservationWindow({ rentalCarId: rentalCarId, crudAction: "create" });
+                        WindowHandler.createReservationHandlerWindow({ rentalCarId: rentalCarId, crudAction: "create" });
                     },
                 },
                 {
@@ -89,15 +89,12 @@ export class ContextmenuHandler {
             const menuTemplate = Menu.buildFromTemplate([
                 {
                     label: "予約変更",
-                    click: async () => {
-                        if (!WindowHandler.windows.handleReservationWindow) {
-                            WindowHandler.createHandleReservationWindow({ reservationId: reservationId, crudAction: "update" });
-                        }
-                    }
+                    click: async () => WindowHandler.createReservationHandlerWindow({ reservationId: reservationId, crudAction: "update" }),
+
                 },
                 {
                     label: "キャンセル",
-                    click: async () => WindowHandler.createHandleReservationWindow({ reservationId: reservationId, crudAction: "cancel" })
+                    click: async () => WindowHandler.createReservationHandlerWindow({ reservationId: reservationId, crudAction: "cancel" })
                 }
             ]);
 
@@ -111,13 +108,13 @@ export class ContextmenuHandler {
                 {
                     label: "ステータス",
                     click: async () => {
-                        WindowHandler.createStatusOfRentalCarHandlerWindow({ rentalCarId: rentalCarId });
+                        WindowHandler.createStatusOfRentalcarHandlerWindow({ rentalcarId: rentalCarId });
                     }
                 },
                 {
                     label: "車両情報更新",
                     click: async () => {
-                        WindowHandler.createEditVehicleAttributesWindow(rentalCarId);
+                        WindowHandler.createRentalcarHandlerWindow({ rentalcarId: rentalCarId });
                     }
                 },
                 {

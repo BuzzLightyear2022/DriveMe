@@ -3,14 +3,11 @@ import { time } from "aws-sdk/clients/frauddetector"
 
 export type Windows = {
     loginWindow: BrowserWindow,
-    menuWindow: BrowserWindow,
-    insertVehicleAttributesWindow: BrowserWindow,
-    insertReservationWindow: BrowserWindow,
+    rentalcarHandlerWindow: BrowserWindow,
+    reservationHandlerWindow: BrowserWindow,
     displayReservationWindow: BrowserWindow,
-    handleReservationWindow: BrowserWindow,
-    editVehicleAttributesWindow: BrowserWindow,
-    editCarCatalogWindow: BrowserWindow,
-    statusOfRentalCarHandlerWindow: BrowserWindow
+    statusOfRentalcarHandlerWindow: BrowserWindow,
+    loanerRentalHandlerWindow: BrowserWindow
 }
 
 export type CarCatalog = {

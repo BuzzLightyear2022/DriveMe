@@ -1,0 +1,29 @@
+.container {
+    white-space: nowrap;
+    min-width: 800px;
+}
+
+.flight-number-span {
+    width: 3em;
+}
+
+.input-form {
+    text-align: center;
+}
+
+#new-return-datetime {
+    width: 9em;
+}
+
+#comment-textarea {
+    max-width: 100%;
+    height: 10em;
+}
+
+label {
+    user-select: none;
+}
+
+.btn {
+    width: 5em;
+}

@@ -17,7 +17,9 @@ export default defineConfig((env) => {
       outDir: `.vite/renderer/${name}`,
       rollupOptions: {
         display_reservation: resolve(__dirname, "html", "display_reservation.html"),
-        handle_reservation: resolve(__dirname, "html", "handle_reservation.html")
+        rentalCar_handler: resolve(__dirname, "html", "rentalcar_handler"),
+        rentalcar_status_handler: resolve(__dirname, "html", "rentalcar_status_handler.html"),
+        reservation_handler: resolve(__dirname, "html", "reservation_handler.html")
       }
     },
     plugins: [pluginExposeRenderer(name)],
