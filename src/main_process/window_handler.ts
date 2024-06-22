@@ -4,7 +4,17 @@ import { Windows } from "../@types/types";
 import { ContextmenuHandler } from "./contextmenu_handler";
 import { accessToken } from "./login_process";
 import dotenv from "dotenv";
+import { external } from "vite.base.config";
 dotenv.config();
+
+const openInExtendedDisplay = (targetWindow: BrowserWindow) => {
+    const displays: Electron.Display[] = screen.getAllDisplays();
+    const externalDisplay: Electron.Display = displays.find(display => display.bounds.x !== 0 || display.bounds.y !== 0);
+
+    if (externalDisplay) {
+        targetWindow.setBounds(externalDisplay.bounds);
+    }
+}
 
 export class WindowHandler {
     static preloadScript: string = path.join(__dirname, "preload.js");
@@ -13,7 +23,7 @@ export class WindowHandler {
         rentalcarHandlerWindow: undefined,
         reservationHandlerWindow: undefined,
         displayReservationWindow: undefined,
-        statusOfRentalcarHandlerWindow: undefined,
+        rentalcarStatusHandlerWindow: undefined,
         loanerRentalHandlerWindow: undefined
     }
 
@@ -32,6 +42,8 @@ export class WindowHandler {
         loginWindow.menuBarVisible = false;
 
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+            openInExtendedDisplay(loginWindow);
+
             loginWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
             WindowHandler.windows.loginWindow = loginWindow;
         } else {
@@ -53,6 +65,8 @@ export class WindowHandler {
         ContextmenuHandler.displayVehicleItemMenu();
 
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+            openInExtendedDisplay(displayReservationWindow);
+
             displayReservationWindow.loadURL(new URL("html/display_reservation.html", MAIN_WINDOW_VITE_DEV_SERVER_URL).href);
             WindowHandler.windows.displayReservationWindow = displayReservationWindow;
 
@@ -76,17 +90,19 @@ export class WindowHandler {
                 },
             });
 
-            // win.webContents.openDevTools();
+            win.webContents.openDevTools();
 
             win.webContents.on("dom-ready", () => {
                 win.webContents.send("accessToken", accessToken);
             });
 
-            win.on("closed", () => {
+            win.on("close", () => {
                 WindowHandler.windows.rentalcarHandlerWindow = undefined;
             });
 
             if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+                openInExtendedDisplay(win);
+
                 win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/rentalcar_handler.html`);
                 WindowHandler.windows.rentalcarHandlerWindow = win;
             } else {
@@ -110,11 +126,11 @@ export class WindowHandler {
         win.webContents.openDevTools();
 
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-            win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/rentalcar_handler.html`);
-            WindowHandler.windows.rentalcarHandlerWindow = win;
+            win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/reservation_handler.html`);
+            WindowHandler.windows.reservationHandlerWindow = win;
         } else {
-            win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/rentalcar_handler.html`));
-            WindowHandler.windows.rentalcarHandlerWindow = win;
+            win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/reservation_handler.html`));
+            WindowHandler.windows.reservationHandlerWindow = win;
         }
 
         win.webContents.on("dom-ready", () => {
@@ -154,8 +170,8 @@ export class WindowHandler {
         });
     }
 
-    static createStatusOfRentalcarHandlerWindow = (args: { rentalcarId: string }) => {
-        if (!WindowHandler.windows.statusOfRentalcarHandlerWindow) {
+    static createRentalcarStatusHandlerWindow = (args: { rentalcarId: string }) => {
+        if (!WindowHandler.windows.rentalcarStatusHandlerWindow) {
             const win: BrowserWindow = new BrowserWindow({
                 width: 800,
                 height: 600,
@@ -173,15 +189,15 @@ export class WindowHandler {
             });
 
             win.on("closed", () => {
-                WindowHandler.windows.statusOfRentalcarHandlerWindow = undefined;
+                WindowHandler.windows.rentalcarStatusHandlerWindow = undefined;
             });
 
             if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-                win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/status_of_rentalCar_handler.html`);
-                WindowHandler.windows.statusOfRentalcarHandlerWindow = win;
+                win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/rentalcar_status_handler.html`);
+                WindowHandler.windows.rentalcarStatusHandlerWindow = win;
             } else {
-                win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/status_of_rentalCar_handler.html`));
-                WindowHandler.windows.statusOfRentalcarHandlerWindow = win;
+                win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/rentalcar_status_handler.html`));
+                WindowHandler.windows.rentalcarStatusHandlerWindow = win;
             }
         }
     }

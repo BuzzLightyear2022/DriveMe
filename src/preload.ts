@@ -106,7 +106,7 @@ contextBridge.exposeInMainWorld(
         reservationById: async (args: { reservationId: string }) => {
             return await ipcRenderer.invoke("sqlSelect:reservationById", args);
         },
-        rentalCarById: async (args: { rentalCarId: string }) => {
+        rentalCarById: async (args: { rentalcarId: string }) => {
             return await ipcRenderer.invoke("sqlSelect:rentalCarById", args);
         },
         latestStatusOfRentalCars: async (args: { rentalClass?: string }) => {

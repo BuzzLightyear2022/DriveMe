@@ -36,6 +36,7 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
             | boolean
             | Date
             | null
+            | RentalCarStatus[]
         } = {} as {
             [key in keyof RentalCar]:
             | number
@@ -46,7 +47,7 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
         };
 
         for (const key in vehicleAttributes) {
-            if (key !== "imageFileName") {
+            if (key !== "imageFileName" && key !== "RentalCarStatuses") {
                 textData[key as keyof RentalCar] = vehicleAttributes[key as keyof RentalCar];
             }
         }
@@ -63,8 +64,8 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
                 withCredentials: true
             });
 
-            WindowHandler.windows.insertVehicleAttributesWindow.close();
-            WindowHandler.windows.insertVehicleAttributesWindow = undefined;
+            WindowHandler.windows.rentalcarHandlerWindow.close();
+            WindowHandler.windows.rentalcarHandlerWindow = undefined;
 
             return response.status;
         } catch (error: unknown) {
@@ -90,8 +91,8 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
             });
 
             if (response.status === 200) {
-                WindowHandler.windows.handleReservationWindow.close();
-                WindowHandler.windows.handleReservationWindow = undefined;
+                WindowHandler.windows.reservationHandlerWindow.close();
+                WindowHandler.windows.reservationHandlerWindow = undefined;
             }
 
             return response.status;
@@ -115,8 +116,8 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
             });
 
             if (response.status === 200) {
-                WindowHandler.windows.statusOfRentalCarHandlerWindow.close();
-                WindowHandler.windows.statusOfRentalCarHandlerWindow = undefined;
+                WindowHandler.windows.rentalcarStatusHandlerWindow.close();
+                WindowHandler.windows.rentalcarStatusHandlerWindow = undefined;
             }
         } catch (error: unknown) {
             console.error(error);

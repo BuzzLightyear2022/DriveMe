@@ -65,7 +65,7 @@ export const rentalCarOptionsHandler = async (args: { rentalCarId?: string }) =>
     let selectedRentalCar: RentalCar = undefined;
 
     if (rentalCarId) {
-        selectedRentalCar = await window.sqlSelect.rentalCarById({ rentalCarId: rentalCarId });
+        selectedRentalCar = await window.sqlSelect.rentalCarById({ rentalcarId: rentalCarId });
     }
 
     await rentalClassSelectHandler.handleEvent();

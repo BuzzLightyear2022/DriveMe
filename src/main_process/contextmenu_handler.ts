@@ -56,7 +56,7 @@ export class ContextmenuHandler {
                 {
                     label: "ステータス",
                     click: async () => {
-                        WindowHandler.createStatusOfRentalcarHandlerWindow({ rentalcarId: rentalCarId });
+                        WindowHandler.createRentalcarStatusHandlerWindow({ rentalcarId: rentalCarId });
                     }
                 },
                 {
@@ -85,7 +85,6 @@ export class ContextmenuHandler {
 
     static displayScheduleBarMenu = () => {
         ipcMain.on("contextmenu:schedule-bar", (event: Electron.IpcMainEvent, reservationId: string) => {
-            console.log(event);
             const menuTemplate = Menu.buildFromTemplate([
                 {
                     label: "予約変更",
@@ -108,7 +107,7 @@ export class ContextmenuHandler {
                 {
                     label: "ステータス",
                     click: async () => {
-                        WindowHandler.createStatusOfRentalcarHandlerWindow({ rentalcarId: rentalCarId });
+                        WindowHandler.createRentalcarStatusHandlerWindow({ rentalcarId: rentalCarId });
                     }
                 },
                 {

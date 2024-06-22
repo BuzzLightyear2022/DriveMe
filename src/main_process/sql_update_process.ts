@@ -91,8 +91,7 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
             });
 
             if (response.status === 200) {
-                WindowHandler.windows.handleReservationWindow.close();
-                WindowHandler.windows.handleReservationWindow = undefined;
+                WindowHandler.windows.reservationHandlerWindow.close();
             }
         } catch (error: unknown) {
             return `Failed to update reservation data ${error}`;

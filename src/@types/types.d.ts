@@ -6,7 +6,7 @@ export type Windows = {
     rentalcarHandlerWindow: BrowserWindow,
     reservationHandlerWindow: BrowserWindow,
     displayReservationWindow: BrowserWindow,
-    statusOfRentalcarHandlerWindow: BrowserWindow,
+    rentalcarStatusHandlerWindow: BrowserWindow,
     loanerRentalHandlerWindow: BrowserWindow
 }
 

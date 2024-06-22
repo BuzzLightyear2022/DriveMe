@@ -10,7 +10,7 @@ const serverHost: string = import.meta.env.VITE_EC2_SERVER_HOST;
 const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
 
 (async () => {
-    ipcMain.handle("sqlSelect:rentalCarById", async (event: Electron.IpcMainEvent, args: { rentalCarId: string }) => {
+    ipcMain.handle("sqlSelect:rentalCarById", async (event: Electron.IpcMainEvent, args: { rentalcarId: string }) => {
         const serverEndPoint = `https://${serverHost}:${port}/sqlSelect/rentalCarById`;
         try {
             const response: AxiosResponse = await axios.post(serverEndPoint, args, {
