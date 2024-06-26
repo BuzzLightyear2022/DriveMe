@@ -14,19 +14,21 @@
 
 <body>
     <div class="form-floating p-3" id="input-form-container">
-        <h1>車両情報を更新します</h1>
+        <h1 id="title"></h1>
         <form id="vehicle-input-form">
             <table class="table" id="vehicle-input-table">
                 <tbody>
                     <tr>
-                        <td><label class="form-label" for="#image-input">写真:</label></td>
+                        <td><label class="form-label" for="#image-input">写真</label></td>
                         <td>
-                            <div id="image-preview-container"></div>
+                            <div id="image-preview-container">
+                                <img id="rentalcar-image">
+                            </div>
                         </td>
                     </tr>
 
                     <tr>
-                        <td><label for="rental-class">クラス:</label></td>
+                        <td><label for="rental-class">クラス</label></td>
                         <td>
                             <select id="rental-class">
                             </select>
@@ -34,19 +36,19 @@
                     </tr>
 
                     <tr>
-                        <td><label for="car-model">車種:</label></td>
+                        <td><label for="car-model">車種</label></td>
                         <td><select id="car-model">
                             </select></td>
                     </tr>
 
                     <tr>
-                        <td><label for="model-code">型式:</label></td>
+                        <td><label for="model-code">型式</label></td>
                         <td><select id="model-code">
                             </select></td>
                     </tr>
 
                     <tr>
-                        <td><label for="model-trim">グレード:</label></td>
+                        <td><label for="model-trim">グレード</label></td>
                         <td>
                             <select id="model-trim"></select>
                         </td>
@@ -60,7 +62,7 @@
                     </tr>
 
                     <tr>
-                        <td><label for="drive-type">駆動方式:</label></td>
+                        <td><label for="drive-type">駆動方式</label></td>
                         <td>
                             <select id="drive-type">
                             </select>
@@ -68,7 +70,7 @@
                     </tr>
 
                     <tr>
-                        <td><label for="transmission">トランスミッション:</label></td>
+                        <td><label for="transmission">トランスミッション</label></td>
                         <td>
                             <select id="transmission">
                             </select>
@@ -76,7 +78,7 @@
                     </tr>
 
                     <tr>
-                        <td><label for="body-color">カラー:</label></td>
+                        <td><label for="body-color">カラー</label></td>
                         <td>
                             <select id="body-color">
                             </select>
@@ -84,7 +86,7 @@
                     </tr>
 
                     <tr>
-                        <td><label for="license-plate">ナンバー:</label></td>
+                        <td><label for="license-plate">ナンバー</label></td>
                         <td>
                             <select class="license-plate" id="license-plate-region">
                                 <option>旭川</option>
@@ -100,17 +102,17 @@
                     </tr>
 
                     <tr>
-                        <td><label for="non-smoking">禁煙:</label></td>
+                        <td><label for="non-smoking">禁煙</label></td>
                         <td><input type="checkbox" id="non-smoking"></td>
                     </tr>
 
                     <tr>
-                        <td><label for="insurance-priority">損保優先:</label></td>
+                        <td><label for="insurance-priority">損保優先</label></td>
                         <td><input type="checkbox" id="insurance-priority"></td>
                     </tr>
 
                     <tr>
-                        <td><label for="navigation">カーナビ:</label></td>
+                        <td><label for="navigation">カーナビ</label></td>
                         <td>
                             <select id="navigation">
                             </select>
@@ -118,32 +120,32 @@
                     </tr>
 
                     <tr>
-                        <td><label for="has-back-camera">バックカメラ:</label></td>
+                        <td><label for="has-back-camera">バックカメラ</label></td>
                         <td><input id="has-back-camera" type="checkbox"></td>
                     </tr>
 
                     <tr>
-                        <td><label for="has-DVD">DVD:</label></td>
+                        <td><label for="has-DVD">DVD</label></td>
                         <td><input id="has-DVD" type="checkbox"></td>
                     </tr>
 
                     <tr>
-                        <td><label for="has-television">テレビ:</label></td>
+                        <td><label for="has-television">テレビ</label></td>
                         <td><input id="has-television" type="checkbox"></td>
                     </tr>
 
                     <tr>
-                        <td><label for="has-external-input">外部入力:</label></td>
+                        <td><label for="has-external-input">外部入力</label></td>
                         <td><input id="has-external-input" type="checkbox"></td>
                     </tr>
 
                     <tr>
-                        <td><label for="has-ETC"></label></td>
+                        <td><label for="has-ETC">ETC</label></td>
                         <td><input id="has-ETC" type="checkbox"></td>
                     </tr>
 
                     <tr>
-                        <td><label for="has-spare-key">スペアキー:</label></td>
+                        <td><label for="has-spare-key">スペアキー</label></td>
                         <td><input id="has-spare-key" type="checkbox"></td>
                     </tr>
 
@@ -163,7 +165,7 @@
                     </tr>
 
                     <tr>
-                        <td><label for="other-features">その他情報:</label></td>
+                        <td><label for="other-features">その他情報</label></td>
                         <td>
                             <textarea id="other-features" rows="10" cols="50"></textarea>
                         </td>

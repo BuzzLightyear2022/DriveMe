@@ -14,15 +14,13 @@ const serverHost: string = import.meta.env.VITE_EC2_SERVER_HOST;
 const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
 
 (async () => {
-    ipcMain.handle("sqlInsert:vehicleAttributes", async (event: Electron.IpcMainInvokeEvent, args: { vehicleAttributes: RentalCar }): Promise<string | unknown> => {
-        const { vehicleAttributes } = args;
-
+    ipcMain.handle("sqlInsert:rentalcar", async (event: Electron.IpcMainInvokeEvent, args: { rentalcar: RentalCar }): Promise<string | unknown> => {
         const serverEndPoint = `https://${serverHost}:${port}/sqlInsert/vehicleAttributes`;
 
         const postData: FormData = new FormData();
 
-        const imageFileName = makeImageFileName(vehicleAttributes);
-        const imageUrl: string | undefined = vehicleAttributes.imageFileName;
+        const imageFileName = makeImageFileName(args.rentalcar);
+        const imageUrl: string | undefined | null = args.rentalcar.imageFileName;
         if (imageUrl) {
             const base64Image: string = imageUrl.split(";base64").pop() as string;
             const bufferImage: Buffer = Buffer.from(base64Image, "base64");
@@ -46,9 +44,9 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
             | null
         };
 
-        for (const key in vehicleAttributes) {
+        for (const key in args.rentalcar) {
             if (key !== "imageFileName" && key !== "RentalCarStatuses") {
-                textData[key as keyof RentalCar] = vehicleAttributes[key as keyof RentalCar];
+                textData[key as keyof RentalCar] = args.rentalcar[key as keyof RentalCar];
             }
         }
 

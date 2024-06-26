@@ -10,6 +10,12 @@
     overflow: hidden;
 }
 
+#rentalcar-image {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
 #license-plate-code {
     width: 70px;
 }

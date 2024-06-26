@@ -6,6 +6,7 @@ import "./sql_insert_process";
 import "./sql_select_process";
 import "./fetch_json_process";
 import "./sql_update_process";
+import "./dialog_process";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {

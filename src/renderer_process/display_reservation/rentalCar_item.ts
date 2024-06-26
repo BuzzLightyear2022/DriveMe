@@ -38,6 +38,10 @@ export const RentalCarItem = class extends HTMLElement {
 
             this.append(imageDiv, textDiv);
         })();
+
+        this.addEventListener("contextmenu", () => {
+            window.contextmenu.rentalcarItem({ rentalcarId: rentalCar.id });
+        }, false)
     }
 
     imageDiv = async (args: { fileName: string | null }): Promise<HTMLDivElement> => {

@@ -118,8 +118,8 @@ contextBridge.exposeInMainWorld(
 contextBridge.exposeInMainWorld(
     "sqlInsert",
     {
-        rentalCar: async (args: { rentalCar: RentalCar }): Promise<string> => {
-            return await ipcRenderer.invoke("sqlInsert:rentalCar", args);
+        rentalcar: async (args: { rentalcar: RentalCar }): Promise<string> => {
+            return await ipcRenderer.invoke("sqlInsert:rentalcar", args);
         },
         reservation: async (reservation: Reservation): Promise<string> => {
             return await ipcRenderer.invoke("sqlInsert:reservation", reservation);
@@ -148,8 +148,8 @@ contextBridge.exposeInMainWorld(
         scheduleBar: async (reservationId: string) => {
             ipcRenderer.send("contextmenu:schedule-bar", reservationId);
         },
-        vehicleAttributesItem: async (args: { rentalCarId: string }) => {
-            ipcRenderer.send("contextmenu:rentalCarItem", args);
+        rentalcarItem: async (args: { rentalcarId: string }) => {
+            ipcRenderer.send("contextmenu:rentalcarItem", args);
         },
         scheduleCell: async (args: { rentalCarId: string }) => {
             ipcRenderer.send("contextmenu:schedule-cell", args);

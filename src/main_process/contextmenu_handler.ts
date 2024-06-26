@@ -33,7 +33,7 @@ export class ContextmenuHandler {
                     },
                     {
                         label: "車両新規登録",
-                        click: () => WindowHandler.createRentalcarHandlerWindow({})
+                        click: () => WindowHandler.createRentalcarHandlerWindow({ crudAction: "create" })
                     }
                 ]
             },
@@ -102,18 +102,18 @@ export class ContextmenuHandler {
     }
 
     static displayVehicleItemMenu = () => {
-        ipcMain.on("contextmenu:vehicleAttributesItem", (event: Electron.IpcMainEvent, rentalCarId: string) => {
+        ipcMain.on("contextmenu:rentalcarItem", (event: Electron.IpcMainEvent, args: { rentalcarId: string }) => {
             const menuTemplate = Menu.buildFromTemplate([
                 {
                     label: "ステータス",
                     click: async () => {
-                        WindowHandler.createRentalcarStatusHandlerWindow({ rentalcarId: rentalCarId });
+                        WindowHandler.createRentalcarStatusHandlerWindow({ rentalcarId: args.rentalcarId });
                     }
                 },
                 {
                     label: "車両情報更新",
                     click: async () => {
-                        WindowHandler.createRentalcarHandlerWindow({ rentalcarId: rentalCarId });
+                        WindowHandler.createRentalcarHandlerWindow({ rentalcarId: args.rentalcarId, crudAction: "update" });
                     }
                 },
                 {

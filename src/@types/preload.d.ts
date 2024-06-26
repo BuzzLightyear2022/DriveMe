@@ -42,7 +42,7 @@ export interface sqlSelect {
 }
 
 export interface sqlInsert {
-    rentalCar: (args: { rentalCar: RentalCar }) => Promise<string>;
+    rentalcar: (args: { rentalcar: RentalCar }) => Promise<string>;
     reservation: (reservation: Reservation) => Promise<string>;
     rentalCarStatus: (args: { rentalCarStatus: RentalCarStatus }) => Promise<void>;
 }
@@ -54,7 +54,7 @@ export interface sqlUpdate {
 
 export interface contextmenu {
     scheduleBar: (reservationId: string) => Promise<void>;
-    vehicleAttributesItem: (vehicleId: number) => Promise<void>;
+    rentalcarItem: (args: { rentalcarId: string }) => Promise<void>;
     scheduleCell: (args: { rentalCarId: string }) => Promise<void>;
     getReservationId: () => Promise<string>;
     getRentalCarId: () => Promise<string>;

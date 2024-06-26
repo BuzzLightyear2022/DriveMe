@@ -1,10 +1,14 @@
 import { CarCatalog, RentalCar, Navigations } from "../@types/types";
-import { appendOptions, replaceFullWidthNumToHalfWidthNum, loadImage } from "./common_modules/common_modules";
+import { replaceFullWidthNumToHalfWidthNum } from "./common_modules/replace_fullwidthnum_to_halfwidthnum";
+import { asyncAppendOptions } from "./common_modules/async_append_options";
 import NoImagePng from "../assets/NoImage.png";
 import squareAndArrowUpCircleFill from "../assets/square.and.arrow.up.circle.fill@2x.png";
 
+const titleH1: HTMLElement = document.querySelector("#title");
 const submitButton: HTMLButtonElement = document.querySelector("#submit-button");
 const imagePreviewContainer: HTMLDivElement = document.querySelector("#image-preview-container");
+const rentalcarImage: HTMLImageElement = document.querySelector("#rentalcar-image");
+let rentalcarImageSrc: string | null = null;
 const rentalClassSelect: HTMLSelectElement = document.querySelector("#rental-class");
 const carModelSelect: HTMLSelectElement = document.querySelector("#car-model");
 const modelCodeSelect: HTMLSelectElement = document.querySelector("#model-code");
@@ -31,129 +35,104 @@ const JAFCardNumberInput: HTMLInputElement = document.querySelector("#JAFcard-nu
 const JAFCardExpInput: HTMLInputElement = document.querySelector("#JAFcard-exp");
 const otherFeaturesInput: HTMLInputElement = document.querySelector("#other-features");
 
-let selectedImageUrl: string = null;
+const createOptions = async (args?: { changedSelect: string }): Promise<void> => {
+    const carCatalog: CarCatalog = await window.fetchJson.carCatalog();
 
-const createOptions = (
-    args: {
-        carCatalog: CarCatalog,
-        target?: HTMLSelectElement
-    }
-): void => {
-    const { carCatalog, target } = args;
+    const appendCarModels = async () => {
+        const selectedRentalClass: string = rentalClassSelect.value;
 
-    const selectedRentalClass: string = rentalClassSelect.value;
-
-    if (target !== carModelSelect) {
         const carModels: string[] = Object.keys(carCatalog.rentalClasses[selectedRentalClass]);
-        appendOptions({
-            selectbox: carModelSelect,
-            options: carModels
-        });
+        await asyncAppendOptions({ options: carModels, select: carModelSelect });
     }
 
-    const selectedCarModel: string = carModelSelect.value;
-    const {
-        modelCode,
-        driveType,
-        transmission,
-        bodyColor
-    } = carCatalog.rentalClasses[selectedRentalClass][selectedCarModel];
-    appendOptions({
-        selectbox: modelCodeSelect,
-        options: modelCode as string[]
-    });
-    appendOptions({
-        selectbox: driveTypeSelect,
-        options: driveType as string[]
-    });
-    appendOptions({
-        selectbox: transmissionSelect,
-        options: transmission as string[]
-    });
-    appendOptions({
-        selectbox: bodyColorSelect,
-        options: bodyColor as string[]
-    });
+    const appendOtherOptions = async () => {
+        const selectedRentalClass = rentalClassSelect.value;
+        const selectedCarModel = carModelSelect.value;
+        const selectedCarModelOptions: {
+            bodyColor?: string[],
+            driveType?: string[],
+            modelCode?: string[],
+            modelTrim?: string[],
+            transmission?: string[]
+        } = carCatalog.rentalClasses[selectedRentalClass][selectedCarModel];
+
+        if (selectedCarModelOptions && selectedCarModelOptions.modelCode) {
+            const modelCodes: string[] = selectedCarModelOptions.modelCode;
+            await asyncAppendOptions({ options: modelCodes, select: modelCodeSelect });
+        }
+
+        if (selectedCarModelOptions && selectedCarModelOptions.modelTrim) {
+            const modelTrims: string[] = selectedCarModelOptions.modelTrim;
+            await asyncAppendOptions({ options: modelTrims, select: modelTrimSelect });
+        }
+
+        if (selectedCarModelOptions && selectedCarModelOptions.driveType) {
+            const driveTypes: string[] = selectedCarModelOptions.driveType;
+            await asyncAppendOptions({ options: driveTypes, select: driveTypeSelect });
+        }
+
+        if (selectedCarModelOptions && selectedCarModelOptions.transmission) {
+            const transmissions: string[] = selectedCarModelOptions.transmission;
+            await asyncAppendOptions({ options: transmissions, select: transmissionSelect });
+        }
+
+        if (selectedCarModelOptions && selectedCarModelOptions.bodyColor) {
+            const bodyColors: string[] = selectedCarModelOptions.bodyColor;
+            await asyncAppendOptions({ options: bodyColors, select: bodyColorSelect });
+        }
+    }
+
+    const removeOtherOptions = () => {
+        while (modelCodeSelect.firstChild) {
+            modelCodeSelect.removeChild(modelCodeSelect.firstChild);
+        }
+
+        while (modelTrimSelect.firstChild) {
+            modelTrimSelect.removeChild(modelTrimSelect.firstChild);
+        }
+
+        while (driveTypeSelect.firstChild) {
+            driveTypeSelect.removeChild(driveTypeSelect.firstChild);
+        }
+
+        while (transmissionSelect.firstChild) {
+            transmissionSelect.removeChild(transmissionSelect.firstChild);
+        }
+
+        while (bodyColorSelect.firstChild) {
+            bodyColorSelect.removeChild(bodyColorSelect.firstChild);
+        }
+    }
+
+    if ((carCatalog && carCatalog.rentalClasses) && !args) {
+        const rentalClasses: string[] = Object.keys(carCatalog.rentalClasses);
+        await asyncAppendOptions({ options: rentalClasses, select: rentalClassSelect });
+
+        appendCarModels();
+    }
+
+    appendOtherOptions();
+
+    if (args && args.changedSelect) {
+        switch (args.changedSelect) {
+            case "rentalClass":
+                while (carModelSelect.firstChild) {
+                    carModelSelect.removeChild(carModelSelect.firstChild);
+                }
+
+                appendCarModels();
+                appendOtherOptions();
+            case "carModel":
+                removeOtherOptions();
+                appendOtherOptions();
+        }
+    }
 }
 
-replaceFullWidthNumToHalfWidthNum({ element: licensePlateCodeInput, limitDigits: 3 });
-replaceFullWidthNumToHalfWidthNum({ element: licensePlateNumberInput, limitDigits: 4 });
-replaceFullWidthNumToHalfWidthNum({ element: JAFCardNumberInput, limitDigits: 3 });
-
-(async () => {
-    const vehicleId: string = await window.contextmenu.getRentalCarId();
-    const currentVehicleAttributes: RentalCar = await window.sqlSelect.rentalCarById({ rentalcarId: vehicleId });
-
+const imageInputHandler = async (args?: { imageFileName?: string }) => {
     const serverHost: string = await window.serverInfo.serverHost();
     const port: string = await window.serverInfo.port();
     const imageDirectory: string = await window.serverInfo.imageDirectory();
-
-    const carCatalog: CarCatalog = await window.fetchJson.carCatalog();
-    const navigationsJson: Navigations = await window.fetchJson.navigations();
-    const navigations: string[] = navigationsJson["navigations"];
-
-    const currentImageUrl = `http://${serverHost}:${port}/${imageDirectory}/${currentVehicleAttributes.imageFileName}`;
-
-    const imageElm = await loadImage({
-        fileName: currentVehicleAttributes.imageFileName,
-        width: "100%",
-        height: "100%"
-    });
-
-    imagePreviewContainer.append(imageElm);
-
-    const rentalClasses: string[] = Object.keys(carCatalog.rentalClasses);
-    appendOptions({
-        selectbox: rentalClassSelect,
-        options: rentalClasses
-    });
-    rentalClassSelect.value = currentVehicleAttributes.rentalClass;
-
-    const selectedRentalClass: string = rentalClassSelect.value;
-    appendOptions({ selectbox: carModelSelect, options: Object.keys(carCatalog.rentalClasses[selectedRentalClass]) });
-    carModelSelect.value = currentVehicleAttributes.carModel;
-
-    const selectedCarModel: string = carModelSelect.value;
-    appendOptions({ selectbox: modelCodeSelect, options: carCatalog.rentalClasses[selectedRentalClass][selectedCarModel].modelCode });
-    modelCodeSelect.value = currentVehicleAttributes.modelCode;
-
-    appendOptions({ selectbox: driveTypeSelect, options: carCatalog.rentalClasses[selectedRentalClass][selectedCarModel].driveType });
-    driveTypeSelect.value = currentVehicleAttributes.driveType;
-
-    appendOptions({ selectbox: transmissionSelect, options: carCatalog.rentalClasses[selectedRentalClass][selectedCarModel].transmission });
-    transmissionSelect.value = currentVehicleAttributes.transmission;
-
-    appendOptions({ selectbox: bodyColorSelect, options: carCatalog.rentalClasses[selectedRentalClass][selectedCarModel].bodyColor });
-    bodyColorSelect.value = currentVehicleAttributes.bodyColor;
-
-    licensePlateRegionSelect.value = currentVehicleAttributes.licensePlateRegion;
-    licensePlateCodeInput.value = currentVehicleAttributes.licensePlateCode;
-    licensePlateHiraganaSelect.value = currentVehicleAttributes.licensePlateHiragana;
-    licensePlateNumberInput.value = currentVehicleAttributes.licensePlateNumber;
-    nonSmokingCheck.checked = currentVehicleAttributes.nonSmoking;
-    insurancePriorityCheck.checked = currentVehicleAttributes.insurancePriority;
-
-    appendOptions({ selectbox: navigationSelect, options: navigations });
-    navigationSelect.value = currentVehicleAttributes.navigation;
-
-    hasBackCameraCheck.checked = currentVehicleAttributes.hasBackCamera;
-    hasDVDCheck.checked = currentVehicleAttributes.hasDVD;
-    hasTelevisionCheck.checked = currentVehicleAttributes.hasTelevision;
-    hasExternalInputCheck.checked = currentVehicleAttributes.hasExternalInput;
-    hasSpareKeyCheck.checked = currentVehicleAttributes.hasSpareKey;
-    hasJAFCardCheck.checked = currentVehicleAttributes.hasJAFCard;
-    JAFCardNumberInput.value = currentVehicleAttributes.JAFCardNumber;
-    JAFCardExpInput.value = String(currentVehicleAttributes.JAFCardExp).split("T")[0];
-    otherFeaturesInput.value = currentVehicleAttributes.otherFeatures;
-
-    rentalClassSelect.addEventListener("change", () => {
-        createOptions({ carCatalog: carCatalog });
-    }, false);
-
-    carModelSelect.addEventListener("change", (event: Event) => {
-        const target = event.target as HTMLSelectElement;
-        createOptions({ carCatalog: carCatalog, target: target });
-    }, false);
 
     const overlayElement = document.createElement("div");
     Object.assign(overlayElement.style, {
@@ -175,67 +154,149 @@ replaceFullWidthNumToHalfWidthNum({ element: JAFCardNumberInput, limitDigits: 3 
         event.stopPropagation();
     }, false);
 
-    imageElm.parentElement.addEventListener("click", async () => {
+    rentalcarImage.addEventListener("dragstart", (event: MouseEvent) => {
+        event.preventDefault();
+    }, false);
+
+    if (args && args.imageFileName) {
+        rentalcarImage.src = args.imageFileName;
+        rentalcarImageSrc = args.imageFileName;
+    } else {
+        rentalcarImage.src = NoImagePng;
+        rentalcarImageSrc = null;
+    }
+
+    imagePreviewContainer.addEventListener("click", async () => {
         try {
             const imageUrl = await window.dialog.openFile();
-            if (imageUrl) {
-                imageElm.src = imageUrl;
-                selectedImageUrl = imageElm.src;
-            } else if (window.dialog.openFileCancelled()) {
-                imageElm.src = currentVehicleAttributes.imageFileName ? currentImageUrl : NoImagePng;
-                selectedImageUrl = null;
+            if ((args && args.imageFileName) && imageUrl) {
+                rentalcarImage.src = imageUrl;
+                rentalcarImageSrc = imageUrl;
+            } else if ((args && args.imageFileName) && window.dialog.openFileCancelled()) {
+                rentalcarImage.src = args.imageFileName;
+                rentalcarImageSrc = args.imageFileName;
+            } else if (imageUrl) {
+                rentalcarImage.src = imageUrl;
+                rentalcarImageSrc = imageUrl;
+            } else {
+                rentalcarImage.src = NoImagePng;
+                rentalcarImageSrc = null;
             }
         } catch (error: unknown) {
             console.error(error);
         }
     }, false);
 
-    imageElm.parentElement.addEventListener("mouseenter", () => {
-        imageElm.parentElement.append(overlayElement);
+    imagePreviewContainer.addEventListener("mouseenter", () => {
+        imagePreviewContainer.append(overlayElement);
     }, false);
 
-    imageElm.parentElement.addEventListener("mouseleave", () => {
+    imagePreviewContainer.addEventListener("mouseleave", () => {
         overlayElement.remove();
     }, false);
+}
 
-    submitButton.addEventListener("click", async (): Promise<void> => {
-        let JAFCardNumber: string | null = null;
-        JAFCardNumber = JAFCardNumberInput.value ? JAFCardNumberInput.value : null;
+const getSubmitData = (args?: { rentalcarId?: string }) => {
+    const rentalcar: RentalCar = {
+        id: null,
+        imageFileName: rentalcarImageSrc,
+        carModel: carModelSelect.value,
+        modelCode: modelCodeSelect.value,
+        modelTrim: modelTrimSelect.value,
+        seatingCapacity: Number(seatingCapacityInput.value),
+        nonSmoking: nonSmokingCheck.checked,
+        insurancePriority: insurancePriorityCheck.checked,
+        licensePlateRegion: licensePlateRegionSelect.value,
+        licensePlateCode: licensePlateCodeInput.value,
+        licensePlateHiragana: licensePlateHiraganaSelect.value,
+        licensePlateNumber: licensePlateNumberInput.value,
+        bodyColor: bodyColorSelect.value,
+        driveType: driveTypeSelect.value,
+        transmission: transmissionSelect.value,
+        rentalClass: rentalClassSelect.value,
+        navigation: navigationSelect.value,
+        hasBackCamera: hasBackCameraCheck.checked,
+        hasDVD: hasDVDCheck.checked,
+        hasTelevision: hasTelevisionCheck.checked,
+        hasExternalInput: hasExternalInputCheck.checked,
+        hasETC: hasETCCheck.checked,
+        hasSpareKey: hasSpareKeyCheck.checked,
+        otherFeatures: otherFeaturesInput.value,
+        hasJAFCard: hasJAFCardCheck.checked,
+        JAFCardNumber: JAFCardNumberInput.value,
+        JAFCardExp: new Date(JAFCardExpInput.value)
+    }
 
-        const newVehicleAttributes: RentalCar = {
-            id: currentVehicleAttributes.id,
-            imageFileName: selectedImageUrl,
-            carModel: carModelSelect.value,
-            modelCode: modelCodeSelect.value,
-            modelTrim: modelTrimSelect.value,
-            seatingCapacity: Number(seatingCapacityInput.value),
-            nonSmoking: nonSmokingCheck.checked,
-            insurancePriority: insurancePriorityCheck.checked,
-            licensePlateRegion: licensePlateRegionSelect.value,
-            licensePlateCode: licensePlateCodeInput.value,
-            licensePlateHiragana: licensePlateHiraganaSelect.value,
-            licensePlateNumber: licensePlateNumberInput.value,
-            bodyColor: bodyColorSelect.value,
-            driveType: driveTypeSelect.value,
-            transmission: transmissionSelect.value,
-            rentalClass: rentalClassSelect.value,
-            navigation: navigationSelect.value,
-            hasBackCamera: hasBackCameraCheck.checked,
-            hasDVD: hasDVDCheck.checked,
-            hasTelevision: hasTelevisionCheck.checked,
-            hasExternalInput: hasExternalInputCheck.checked,
-            hasETC: hasETCCheck.checked,
-            hasSpareKey: hasSpareKeyCheck.checked,
-            otherFeatures: otherFeaturesInput.value,
-            hasJAFCard: hasJAFCardCheck.checked,
-            JAFCardNumber: JAFCardNumber,
-            JAFCardExp: new Date(JAFCardExpInput.value)
-        }
+    if (args && args.rentalcarId) {
+        rentalcar.id = args.rentalcarId
+    }
+    return rentalcar;
+}
 
-        try {
-            await window.sqlUpdate.vehicleAttributes({ vehicleAttributes: newVehicleAttributes });
-        } catch (error: unknown) {
-            console.error("Failed to insert VehicleAttributes: ", error);
-        }
-    }, false);
-})()
+const jafCardInputHandler = () => {
+    hasJAFCardCheck.checked ? JAFCardNumberInput.disabled = false : JAFCardNumberInput.disabled = true;
+    hasJAFCardCheck.checked ? JAFCardExpInput.disabled = false : JAFCardExpInput.disabled = true;
+}
+
+replaceFullWidthNumToHalfWidthNum({ element: seatingCapacityInput, limitDigits: 2 });
+replaceFullWidthNumToHalfWidthNum({ element: licensePlateCodeInput, limitDigits: 3 });
+replaceFullWidthNumToHalfWidthNum({ element: licensePlateNumberInput, limitDigits: 4 });
+replaceFullWidthNumToHalfWidthNum({ element: JAFCardNumberInput, limitDigits: 3 });
+
+(async () => {
+    const crudArgs = await window.contextmenu.getCrudArgs();
+
+    await imageInputHandler();
+
+    const navigations: Navigations = await window.fetchJson.navigations();
+    await asyncAppendOptions({ options: navigations.navigations, select: navigationSelect });
+
+    await createOptions();
+
+    jafCardInputHandler();
+    hasJAFCardCheck.addEventListener("change", jafCardInputHandler, false);
+
+    switch (crudArgs.crudAction) {
+        case "create":
+            titleH1.textContent = "車両情報を入力してください";
+            rentalcarImage.src = NoImagePng;
+
+            submitButton.addEventListener("click", async () => {
+                const submitData: RentalCar = getSubmitData();
+                console.log(submitData);
+                await window.sqlInsert.rentalcar({ rentalcar: submitData });
+            }, false)
+        case "update":
+
+    }
+
+    const vehicleId: string = await window.contextmenu.getRentalCarId();
+    const currentVehicleAttributes: RentalCar = await window.sqlSelect.rentalCarById({ rentalcarId: vehicleId });
+
+    licensePlateRegionSelect.value = currentVehicleAttributes.licensePlateRegion;
+    licensePlateCodeInput.value = currentVehicleAttributes.licensePlateCode;
+    licensePlateHiraganaSelect.value = currentVehicleAttributes.licensePlateHiragana;
+    licensePlateNumberInput.value = currentVehicleAttributes.licensePlateNumber;
+    nonSmokingCheck.checked = currentVehicleAttributes.nonSmoking;
+    insurancePriorityCheck.checked = currentVehicleAttributes.insurancePriority;
+
+    navigationSelect.value = currentVehicleAttributes.navigation;
+
+    hasBackCameraCheck.checked = currentVehicleAttributes.hasBackCamera;
+    hasDVDCheck.checked = currentVehicleAttributes.hasDVD;
+    hasTelevisionCheck.checked = currentVehicleAttributes.hasTelevision;
+    hasExternalInputCheck.checked = currentVehicleAttributes.hasExternalInput;
+    hasSpareKeyCheck.checked = currentVehicleAttributes.hasSpareKey;
+    hasJAFCardCheck.checked = currentVehicleAttributes.hasJAFCard;
+    JAFCardNumberInput.value = currentVehicleAttributes.JAFCardNumber;
+    JAFCardExpInput.value = String(currentVehicleAttributes.JAFCardExp).split("T")[0];
+    otherFeaturesInput.value = currentVehicleAttributes.otherFeatures;
+})();
+
+rentalClassSelect.addEventListener("change", () => {
+    createOptions({ changedSelect: "rentalClass" });
+}, false);
+
+carModelSelect.addEventListener("change", () => {
+    createOptions({ changedSelect: "carModel" });
+}, false)

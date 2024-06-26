@@ -43,6 +43,7 @@ export class WindowHandler {
 
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
             openInExtendedDisplay(loginWindow);
+            loginWindow.webContents.openDevTools();
 
             loginWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
             WindowHandler.windows.loginWindow = loginWindow;
@@ -78,7 +79,7 @@ export class WindowHandler {
         }
     }
 
-    static createRentalcarHandlerWindow = (args?: { rentalcarId?: string }): void => {
+    static createRentalcarHandlerWindow = (args?: { rentalcarId?: string, crudAction: string }): void => {
         if (!WindowHandler.windows.rentalcarHandlerWindow) {
             const { height } = screen.getPrimaryDisplay().workAreaSize;
 
@@ -93,7 +94,7 @@ export class WindowHandler {
             win.webContents.openDevTools();
 
             win.webContents.on("dom-ready", () => {
-                win.webContents.send("accessToken", accessToken);
+                win.webContents.send("contextmenu:getCrudArgs", args);
             });
 
             win.on("close", () => {
