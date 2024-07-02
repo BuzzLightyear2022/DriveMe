@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import axios, { AxiosResponse } from "axios";
 import FormData from "form-data";
-import { makeImageFileName } from "./common_modules";
+import { makeImageFileName } from "./common_modules/makeImageFIleName";
 import { RentalCar, Reservation } from "../@types/types";
 import { accessToken } from "./login_process";
 import { WindowHandler } from "./window_handler";
@@ -14,21 +14,39 @@ const serverHost: string = import.meta.env.VITE_EC2_SERVER_HOST;
 const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
 
 (async () => {
-    ipcMain.on("sqlUpdate:vehicleAttributes", async (event: Electron.IpcMainInvokeEvent, args: { rentalCar: RentalCar }) => {
-        const { rentalCar } = args;
-        const serverEndPoint = `https://${serverHost}:${port}/sqlUpdate/vehicleAttributes`;
+    ipcMain.on("sqlUpdate:rentalcar", async (event: Electron.IpcMainInvokeEvent, args: { currentData: RentalCar, newData: RentalCar }) => {
+        const serverEndPoint = `https://${serverHost}:${port}/sqlUpdate/rentalcar`;
 
         const postData: FormData = new FormData();
 
-        const imageFileName: string = makeImageFileName(rentalCar);
-        if (imageFileName) {
-            const imageUrl: string | null = rentalCar.imageFileName;
-            if (imageUrl) {
-                const base64Image: string = imageUrl.split(";base64").pop();
-                const bufferImage: Buffer = Buffer.from(base64Image, "base64");
-                postData.append("imageUrl", bufferImage, imageFileName);
+        if (args && args.newData && args.newData.imageFileName) {
+            if (args.currentData.imageFileName && args.newData.imageFileName === args.currentData.imageFileName) {
+                postData.append("imageUrl", args.currentData.imageFileName);
+            } else {
+                const imageFileName: string = makeImageFileName(args.newData);
+                const imageUrl: string = args.newData.imageFileName;
+
+                if (imageUrl) {
+                    const base64Image: string = imageUrl.split(";base64").pop();
+                    const bufferImage: Buffer = Buffer.from(base64Image, "base64");
+                    postData.append("imageUrl", bufferImage, imageFileName);
+                }
             }
+        } else if (args && args.currentData && args.currentData.imageFileName) {
+            postData.append("imageUrl", args.currentData.imageFileName);
         }
+        // if ((args && args.newData && args.newData.imageFileName) && (args && args.newData && args.newData.imageFileName) && (args.newData.imageFileName === args.currentData.imageFileName)) {
+        //     const emptyBuffer = Buffer.alloc(0);
+        //     postData.append("imageUrl", emptyBuffer, args.currentData.imageFileName);
+        // } else {
+        //     const imageFileName: string = makeImageFileName(args.newData);
+        //     const imageUrl: string | null = args.newData.imageFileName;
+        //     if (imageUrl) {
+        //         const base64Image: string = imageUrl.split(";base64,").pop();
+        //         const bufferImage: Buffer = Buffer.from(base64Image, "base64");
+        //         postData.append("imageUrl", bufferImage, imageFileName);
+        //     }
+        // }
 
         const textData: {
             [key in keyof RentalCar]:
@@ -37,6 +55,7 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
             | boolean
             | Date
             | null
+            | any
         } = {} as {
             [key in keyof RentalCar]:
             | string
@@ -44,20 +63,18 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
             | boolean
             | Date
             | null
+            | any
         };
 
-        for (const key in rentalCar) {
+        for (const key in args.newData) {
             if (key !== "imageFileName") {
-                textData[key as keyof RentalCar] = rentalCar[key as keyof RentalCar];
+                textData[key as keyof RentalCar] = args.newData[key as keyof RentalCar];
             }
         }
 
         postData.append("data", JSON.stringify(textData));
 
         try {
-            WindowHandler.windows.editVehicleAttributesWindow.close();
-            WindowHandler.windows.editVehicleAttributesWindow = undefined;
-
             const response: AxiosResponse = await axios.post(serverEndPoint, postData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -67,7 +84,10 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
                 withCredentials: true
             });
 
-            return response.status;
+            if (response.status === 200) {
+                WindowHandler.windows.rentalcarHandlerWindow.close();
+                WindowHandler.windows.rentalcarHandlerWindow = undefined;
+            }
         } catch (error: unknown) {
             console.log("Failed to send vehicleAttributes data: " + error);
         }

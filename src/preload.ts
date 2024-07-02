@@ -136,8 +136,8 @@ contextBridge.exposeInMainWorld(
         reservation: async (reservation: Reservation): Promise<void> => {
             ipcRenderer.send("sqlUpdate:reservation", reservation);
         },
-        vehicleAttributes: async (args: { vehicleAttributes: RentalCar }): Promise<void> => {
-            ipcRenderer.send("sqlUpdate:vehicleAttributes", args);
+        rentalcar: async (args: { currentData: RentalCar, newData: RentalCar }): Promise<void> => {
+            ipcRenderer.send("sqlUpdate:rentalcar", args);
         }
     }
 );

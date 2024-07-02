@@ -1,3 +1,5 @@
+import { RentalCar } from "./types";
+
 export interface serverInfo {
     serverHost: () => Promise<string>;
     port: () => Promise<string>;
@@ -49,7 +51,7 @@ export interface sqlInsert {
 
 export interface sqlUpdate {
     reservation: (reservation: Reservation) => Promise<void>;
-    vehicleAttributes: (args: { vehicleAttributes: VehicleAttributes }) => Promise<void>
+    rentalcar: (args: { currentData: RentalCar, newData: RentalCar }) => Promise<void>
 }
 
 export interface contextmenu {

@@ -52,7 +52,7 @@ export type RentalCar = {
     JAFCardNumber?: string,
     JAFCardExp?: Date,
     otherFeatures?: string,
-    RentalCarStatuses?: RentalCarStatus[]
+    RentalCarStatuses?: RentalCarStatus[] | null
 }
 
 export type Reservation = {
