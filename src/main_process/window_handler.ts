@@ -68,7 +68,7 @@ export class WindowHandler {
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
             openInExtendedDisplay(displayReservationWindow);
 
-            displayReservationWindow.loadURL(new URL("html/display_reservation.html", MAIN_WINDOW_VITE_DEV_SERVER_URL).href);
+            displayReservationWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/display_reservation.html`);
             WindowHandler.windows.displayReservationWindow = displayReservationWindow;
 
             displayReservationWindow.webContents.openDevTools();
@@ -91,8 +91,6 @@ export class WindowHandler {
                 },
             });
 
-            win.webContents.openDevTools();
-
             win.webContents.on("dom-ready", () => {
                 win.webContents.send("contextmenu:getCrudArgs", args);
             });
@@ -103,6 +101,7 @@ export class WindowHandler {
 
             if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
                 openInExtendedDisplay(win);
+                win.webContents.openDevTools();
 
                 win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/rentalcar_handler.html`);
                 WindowHandler.windows.rentalcarHandlerWindow = win;
@@ -124,9 +123,8 @@ export class WindowHandler {
             },
         });
 
-        win.webContents.openDevTools();
-
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+            win.webContents.openDevTools();
             win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/reservation_handler.html`);
             WindowHandler.windows.reservationHandlerWindow = win;
         } else {
@@ -152,10 +150,11 @@ export class WindowHandler {
             }
         });
 
-        win.webContents.openDevTools();
-
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-            win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/loaner_rental_handler.html`);
+            openInExtendedDisplay(win);
+            win.webContents.openDevTools();
+
+            win.loadURL(new URL("html/loaner_rental_handler.html", MAIN_WINDOW_VITE_DEV_SERVER_URL).href);
             WindowHandler.windows.loanerRentalHandlerWindow = win;
         } else {
             win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/loaner_rental_handler.html`));
@@ -181,8 +180,6 @@ export class WindowHandler {
                 }
             });
 
-            win.webContents.openDevTools();
-
             win.menuBarVisible = false;
 
             win.webContents.on("dom-ready", () => {
@@ -194,6 +191,7 @@ export class WindowHandler {
             });
 
             if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+                win.webContents.openDevTools();
                 win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/rentalcar_status_handler.html`);
                 WindowHandler.windows.rentalcarStatusHandlerWindow = win;
             } else {

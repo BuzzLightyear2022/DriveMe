@@ -308,6 +308,9 @@ convertToKatakana(furiganaInput);
 
     switch (crudArgs.crudAction) {
         case "create":
+            titleElement.textContent = "予約情報を入力してください";
+            submitButton.textContent = "予約確定";
+
             const now: Date = new Date();
             const todayString: string = formatDateForInput({ dateObject: now });
             receptionDateInput.value = todayString;
@@ -315,6 +318,8 @@ convertToKatakana(furiganaInput);
             await rentalCarOptionsHandler({ rentalCarId: crudArgs.rentalCarId });
             break;
         case "update":
+            titleElement.textContent = "予約情報を更新します";
+
             await populateFormInputs({ reservationId: crudArgs.reservationId, carCatalog: carCatalog });
             submitButton.textContent = "変更確定";
             break;

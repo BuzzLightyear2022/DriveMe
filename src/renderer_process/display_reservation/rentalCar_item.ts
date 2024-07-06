@@ -8,14 +8,12 @@ export const RentalCarItem = class extends HTMLElement {
 
     rentalCar: RentalCar;
 
-    constructor(args: { rentalCar: RentalCar }) {
+    constructor(args: { rentalcar: RentalCar }) {
         super();
-
-        const { rentalCar } = args;
 
         RentalCarItem.instances.push(this);
 
-        this.setAttribute("data-rentalCar-id", String(rentalCar.id));
+        this.setAttribute("data-rentalCar-id", String(args.rentalcar.id));
 
         Object.assign(this.style, {
             display: "flex",
@@ -33,14 +31,14 @@ export const RentalCarItem = class extends HTMLElement {
         });
 
         (async () => {
-            const imageDiv: HTMLDivElement = await this.imageDiv({ fileName: rentalCar.imageFileName });
-            const textDiv: HTMLDivElement = this.textDiv({ rentalCar: rentalCar });
+            const imageDiv: HTMLDivElement = await this.imageDiv({ fileName: args.rentalcar.imageFileName });
+            const textDiv: HTMLDivElement = this.textDiv({ rentalCar: args.rentalcar });
 
             this.append(imageDiv, textDiv);
         })();
 
         this.addEventListener("contextmenu", () => {
-            window.contextmenu.rentalcarItem({ rentalcarId: rentalCar.id });
+            window.contextmenu.rentalcarItem({ rentalcarId: args.rentalcar.id });
         }, false)
     }
 

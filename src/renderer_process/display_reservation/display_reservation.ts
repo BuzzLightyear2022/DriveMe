@@ -1,4 +1,4 @@
-import { RentalCar, RentalCarStatus } from "../../@types/types";
+import { RentalCar } from "../../@types/types";
 import { RentalCarItem } from "./rentalCar_item";
 import { CalendarDate } from "./calendar_date";
 import { VisualSchedule } from "./visual_schedule/visual_schedule";
@@ -22,16 +22,22 @@ const appendRentalClassOptions = async (): Promise<void> => {
     rentalClassSelect.append(allOption);
 }
 
-const appendRentalCarItems = async (args: { rentalCars: RentalCar[] }): Promise<void> => {
-    const { rentalCars } = args;
-
+const appendRentalCarItems = async (args: { rentalcars: RentalCar[] }): Promise<void> => {
     const rentalCarItemsContainer: HTMLDivElement = document.querySelector("#rental-car-items-container");
 
-    if (rentalCars) {
-        await Promise.all(rentalCars.map((rentalCar: RentalCar) => {
-            const rentalCarItem: HTMLElement = new RentalCarItem({ rentalCar: rentalCar });
-            rentalCarItemsContainer.append(rentalCarItem);
-        }));
+    if (args.rentalcars) {
+        for (const rentalcar of args.rentalcars) {
+            const rentalcarItem: HTMLElement = new RentalCarItem({ rentalcar: rentalcar });
+            rentalCarItemsContainer.append(rentalcarItem);
+        }
+
+        await new Promise((resolve) => { setTimeout(resolve, 1000) });
+
+        // await Promise.all(rentalCars.map(async (rentalCar: RentalCar) => {
+        //     const rentalCarItem: HTMLElement = new RentalCarItem({ rentalCar: rentalCar });
+        //     rentalCarItemsContainer.append(rentalCarItem);
+        //     await new Promise((resolve) => { setTimeout(resolve, 1000) });
+        // }));
     }
 }
 
@@ -43,12 +49,20 @@ const rentalCarStatusHandler = async (args: { rentalCars: RentalCar[] }) => {
 
     const rentalCarItems: NodeListOf<Element> = document.querySelectorAll("rental-car-item");
 
+    const existingStatusElement = document.querySelectorAll("rental-car-status");
+    existingStatusElement.forEach((element) => {
+        if (element) {
+            element.remove();
+        }
+    });
+
     for (const rentalCarItem of rentalCarItems) {
         const rentalCarItemId: string = rentalCarItem.getAttribute("data-rentalCar-id");
 
         await Promise.all(rentalCars.map((rentalCar: RentalCar) => {
             if (rentalCarItemId === String(rentalCar.id)) {
                 if (rentalCar.RentalCarStatuses.length) {
+
                     const rentalCarItemWidth: number = rentalCarItem.getBoundingClientRect().width;
                     const centerPositionX = `${(visualScheduleContainerWidth / 2) + rentalCarItemWidth}px`;
 
@@ -120,6 +134,8 @@ const appendCalendarDateElements = async (): Promise<void> => {
     const nextMonthCalendarDate: CalendarDate = new CalendarDate({ dateObject: nextMonthDate });
 
     dateContainer.append(previousMonthCalendarDate, currentMonthCalendarDate, nextMonthCalendarDate);
+
+    await new Promise((resolve) => { setTimeout(resolve, 100) });
 }
 
 const appendVisualSchedule = async (): Promise<void> => {
@@ -299,9 +315,6 @@ const handleSynchronousScroll = () => {
 }
 
 const calendarUpdater = async () => {
-    const selectedRentalClass: string = rentalClassSelect.value;
-    const rentalCars: RentalCar[] = await window.sqlSelect.rentalCars({ rentalClass: selectedRentalClass });
-
     const rentalCarItemsContainer: HTMLDivElement = document.querySelector("#rental-car-items-container");
     const visualScheduleContainer: HTMLDivElement = document.querySelector("#visual-schedule-container");
 
@@ -316,16 +329,15 @@ const calendarUpdater = async () => {
         visualScheduleContainer.removeChild(visualScheduleContainer.firstChild);
     }
 
-    await appendRentalCarItems({ rentalCars: rentalCars });
+    const selectedRentalClass: string = rentalClassSelect.value;
+    const rentalCars: RentalCar[] = await window.sqlSelect.rentalCars({ rentalClass: selectedRentalClass });
 
-    await new Promise((resolve) => { setTimeout(resolve, 100) });
-
+    await appendRentalCarItems({ rentalcars: rentalCars });
     await appendVisualSchedule();
+    await rentalCarStatusHandler({ rentalCars: rentalCars });
 
     visualScheduleContainer.scrollTop = visualScheduleContainerScrollTop;
     visualScheduleContainer.scrollLeft = visualScheduleContainerScrollLeft;
-
-    await rentalCarStatusHandler({ rentalCars: rentalCars });
 }
 
 const calendarInitializer = async () => {
@@ -334,10 +346,9 @@ const calendarInitializer = async () => {
     const selectedRentalClass: string = rentalClassSelect.value;
     const rentalCars: RentalCar[] = await window.sqlSelect.rentalCars({ rentalClass: selectedRentalClass });
 
-    await appendCalendarDateElements();
-    await appendRentalCarItems({ rentalCars: rentalCars });
 
-    await new Promise((resolve) => { setTimeout(resolve, 1000) });
+    await appendCalendarDateElements();
+    await appendRentalCarItems({ rentalcars: rentalCars });
 
     await appendVisualSchedule();
 
@@ -355,4 +366,5 @@ const calendarInitializer = async () => {
 
     window.webSocket.updateReservationData(calendarUpdater);
     window.webSocket.updateRentalCarStatus(calendarUpdater);
+    window.webSocket.updateRentalcar(calendarUpdater);
 })();

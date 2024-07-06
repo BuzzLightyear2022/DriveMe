@@ -16,10 +16,14 @@ export default defineConfig((env) => {
     build: {
       outDir: `.vite/renderer/${name}`,
       rollupOptions: {
-        display_reservation: resolve(__dirname, "html", "display_reservation.html"),
-        rentalCar_handler: resolve(__dirname, "html", "rentalcar_handler"),
-        rentalcar_status_handler: resolve(__dirname, "html", "rentalcar_status_handler.html"),
-        reservation_handler: resolve(__dirname, "html", "reservation_handler.html")
+        input: {
+          login_window: resolve(__dirname, "index.html"),
+          display_reservation: resolve(__dirname, "html", "display_reservation.html"),
+          rentalCar_handler: resolve(__dirname, "html", "rentalcar_handler.html"),
+          rentalcar_status_handler: resolve(__dirname, "html", "rentalcar_status_handler.html"),
+          reservation_handler: resolve(__dirname, "html", "reservation_handler.html"),
+          loaner_rental_handler: resolve(__dirname, "html", "loaner_rental_handler.html")
+        }
       }
     },
     plugins: [pluginExposeRenderer(name)],

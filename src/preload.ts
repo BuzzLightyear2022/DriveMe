@@ -190,59 +190,25 @@ contextBridge.exposeInMainWorld(
     "webSocket",
     {
         updateReservationData: (callback: () => void): void => {
-            // const eventId: number = generateUniqueId();
             const eventName: string = "wssUpdate:reservationData";
 
-            const listener = () => {
-                callback();
-            }
-
-            ipcRenderer.on(eventName, listener);
-
-            // wsReservationUpdateListeners[eventId] = {
-            //     event: eventName,
-            //     listener: listener
-            // };
-
-            // return eventId;
+            ipcRenderer.on(eventName, () => {
+                return callback();
+            });
         },
-        updateVehicleAttributes: (callback: () => void) => {
-            // const eventId: number = generateUniqueId();
-            const eventName: string = "wssUpdate:vehicleAttributes";
-
-            const listener = () => {
-                callback();
-            }
+        updateRentalcar: (callback: () => void) => {
+            const eventName: string = "wssUpdate:rentalcar";
 
             ipcRenderer.on(eventName, () => {
                 return callback();
             });
-
-            // wsVehicleAttributesUpdateListeners[eventId] = {
-            //     event: eventName,
-            //     listener: listener
-            // }
-
-            // return eventId;
         },
         updateRentalCarStatus: (callback: () => void) => {
-            // const eventId: number = generateUniqueId();
             const eventName: string = "wssUpdate:rentalCarStatus";
-
-            const listener = () => {
-                callback();
-            }
 
             ipcRenderer.on(eventName, () => {
                 return callback();
             });
-
-            // wsVehicleStatusUpdateListeners[eventId] = {
-            //     event: eventName,
-            //     listener: listener
-            // }
-
-            // return eventId;
         }
     }
 );
