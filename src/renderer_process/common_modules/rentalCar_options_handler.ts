@@ -2,7 +2,7 @@ import { RentalCar, LicensePlate } from "../../@types/types";
 
 const rentalClassSelect: HTMLSelectElement = document.querySelector("#rental-class");
 const carModelSelect: HTMLSelectElement = document.querySelector("#car-model");
-const rentalCarIdSelect: HTMLSelectElement = document.querySelector("#rentalCar-id");
+const rentalCarIdSelect: HTMLSelectElement = document.querySelector("#rentalcar-id");
 
 const rentalClassSelectHandler = {
     handleEvent: async () => {

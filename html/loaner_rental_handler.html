@@ -12,8 +12,7 @@
 </head>
 
 <body>
-    <div class="container">
-
+    <div class="container m-5">
         <h1 id="title-element" class="title mt-4 mb-4">損保予約情報を入力してください</h1>
 
         <div class="row">
@@ -56,21 +55,21 @@
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">使用者</span>
-                    <input type="text" class="form-control" id="user-name-input">
+                    <input type="text" class="form-control" id="user-name1-input">
                 </div>
             </div>
 
             <div class="col mb-1">
                 <div class="input-form mb-3">
-                    <input type="radio" class="btn-check" id="non-smoking-radio" name="non-smoking">
+                    <input type="radio" class="btn-check" id="non-smoking-radio" name="non-smoking" value=true>
                     <label for="non-smoking-radio" class="btn btn-outline-success">禁煙車</label>
-                    <input type="radio" class="btn-check" id="ok-smoking-radio" name="non-smoking">
+                    <input type="radio" class="btn-check" id="ok-smoking-radio" name="non-smoking" value=false>
                     <label for="ok-smoking-radio" class="btn btn-outline-danger">喫煙車</label>
                 </div>
 
                 <div class="form-floating">
-                    <select name="car-model" id="car-model-select" class="form-select"></select>
-                    <label for="car-model-select">使用車種</label>
+                    <select name="using-car-model" id="using-car-model-select" class="form-select"></select>
+                    <label for="using-car-model-select">使用車種</label>
                 </div>
             </div>
         </div>
@@ -89,11 +88,11 @@
 
             <div class="col m-2">
                 <div class="input-group">
-                    <input type="text" class="form-control" id="phone-number-first">
+                    <input type="text" class="form-control" id="phone-number-first-input">
                     <span class="input-group-text">-</span>
-                    <input type="text" class="form-control" id="phone-number-second">
+                    <input type="text" class="form-control" id="phone-number-second-input">
                     <span class="input-group-text">-</span>
-                    <input type="text" class="form-control" id="phone-number-third">
+                    <input type="text" class="form-control" id="phone-number-third-input">
                 </div>
             </div>
         </div>
@@ -102,7 +101,7 @@
             <div class="col mb-1">
                 <div class="input-group">
                     <span class="input-group-text">配車日時</span>
-                    <input type="datetime-local" class="form-control" id="dispatch-time-input">
+                    <input type="datetime-local" class="form-control" id="dispatch-datetime-input">
                 </div>
             </div>
         </div>
@@ -207,7 +206,7 @@
             <div class="col mb-1">
                 <div class="input-group">
                     <span class="input-group-text">@</span>
-                    <input type="text" class="form-control" id="daily-amount">
+                    <input type="text" class="form-control" id="daily-amount-input">
                     <span class="input-group-text">円</span>
                 </div>
             </div>
@@ -224,7 +223,7 @@
             <div class="col mb-1">
                 <div class="input-group">
                     <span class="input-group-text">契約者</span>
-                    <input type="text" class="form-control" id="policyholder-name">
+                    <input type="text" class="form-control" id="policyholder-name-input">
                 </div>
             </div>
 
@@ -237,14 +236,14 @@
             <div class="col mb-1">
                 <div class="input-group">
                     <span class="input-group-text">使用者</span>
-                    <input type="text" class="form-control" id="user-name">
+                    <input type="text" class="form-control" id="user-name2-input">
                 </div>
             </div>
 
             <div class="col mb-1">
                 <div class="input-group">
                     <span class="input-group-text">引取先</span>
-                    <input type="text" class="form-control" id="pickup-location">
+                    <input type="text" class="form-control" id="pickup-location-input">
                 </div>
             </div>
         </div>
@@ -260,7 +259,7 @@
             <div class="col mb-1">
                 <div class="input-group">
                     <span class="input-group-text">搬送先</span>
-                    <input type="text" class="form-control" id="transport-location">
+                    <input type="text" class="form-control" id="transport-location-input">
                 </div>
             </div>
         </div>
@@ -280,37 +279,38 @@
 
         <div class="row">
             <div class="col-md">
-                <div class="form-floating p-1">
+                <div class="form-floating">
                     <select name="rental-class" id="rental-class" class="form-select"></select>
-                    <label for="rental-class-select">クラス</label>
+                    <label for="rental-class">クラス</label>
                 </div>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md">
-                <div class="form-floating p-1">
+                <div class="form-floating">
                     <select name="car-model" id="car-model" class="form-select"></select>
-                    <label for="car-model-select">車種</label>
+                    <label for="car-model">車種</label>
                 </div>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md">
-                <div class="form-floating p-1">
-                    <select name="rentalCar-id" id="rentalCar-id" class="form-select"></select>
-                    <label for="license-plate-select">ナンバー</label>
+                <div class="form-floating">
+                    <select name="rentalcar-id" id="rentalcar-id" class="form-select"></select>
+                    <label for="rentalcar-id">ナンバー</label>
                 </div>
             </div>
         </div>
 
         <button class="btn btn-primary m-1" id="submit-button">予約確定</button>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous">
-            </script>
-        <script type="module" src="../src/renderer_process/loaner_rental_handler.ts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous">
+        </script>
+    <script type="module" src="../src/renderer_process/loaner_rental_handler.ts"></script>
 </body>
 
 </html>
