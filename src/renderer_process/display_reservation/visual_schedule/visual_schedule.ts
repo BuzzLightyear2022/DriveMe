@@ -1,4 +1,4 @@
-import { Reservation } from "../../../@types/types";
+import { LoanerRentalReservation, Reservation } from "../../../@types/types";
 import { ScheduleCell } from "./schedule_cell";
 import { ScheduleBar } from "./schedule_bar";
 
@@ -40,16 +40,31 @@ export class VisualSchedule extends HTMLElement {
         const calendarStartDate: Date = new Date(calendarStartTimestamp);
         const calendarEndDate: Date = new Date(calendarEndTimestamp);
 
-        const monthReservations: Reservation[] = await window.sqlSelect.reservations({ startDate: calendarStartDate, endDate: calendarEndDate });
         const scheduleCells: HTMLCollection = this.children;
 
-        if (monthReservations) {
+        const monthReservations: Reservation[] = await window.sqlSelect.reservations({ startDate: calendarStartDate, endDate: calendarEndDate });
+        const monthLoanerRentalReservations: LoanerRentalReservation[] = await window.sqlSelect.loanerRentalReservations({ startDate: calendarStartDate, endDate: calendarEndDate });
+
+        if (monthReservations && monthReservations.length) {
             await Promise.all(monthReservations.map((reservation: Reservation) => {
                 const selectedVehicleId: number = Number(reservation.selectedVehicleId);
                 for (let scheduleCell of scheduleCells) {
                     const scheduleCellRentalCarId: number = Number(scheduleCell.getAttribute("data-rentalCar-id"));
                     if (selectedVehicleId === scheduleCellRentalCarId && !reservation.isCanceled) {
-                        const scheduleBar: ScheduleBar = new ScheduleBar({ calendarDateElement: calendarDateElement, reservation: reservation, color: "green" });
+                        const scheduleBar: ScheduleBar = new ScheduleBar({ calendarDateElement: calendarDateElement, reservation: reservation });
+                        scheduleCell.appendChild(scheduleBar);
+                    }
+                }
+            }));
+        }
+
+        if (monthLoanerRentalReservations && monthLoanerRentalReservations.length) {
+            await Promise.all(monthLoanerRentalReservations.map((loanerRentalReservation: LoanerRentalReservation) => {
+                const selectedRentalcarId: number = Number(loanerRentalReservation.selectedRentalcarId);
+                for (const scheduleCell of scheduleCells) {
+                    const scheduleCellRentalcarId: number = Number(scheduleCell.getAttribute("data-rentalCar-id"));
+                    if (selectedRentalcarId === scheduleCellRentalcarId && !loanerRentalReservation.isCanceled) {
+                        const scheduleBar: ScheduleBar = new ScheduleBar({ calendarDateElement: calendarDateElement, loanerRentalReservation: loanerRentalReservation });
                         scheduleCell.appendChild(scheduleBar);
                     }
                 }

@@ -1,29 +1,46 @@
-import { Reservation } from "../../../@types/types";
+import { LoanerRentalReservation, Reservation } from "../../../@types/types";
 import { getTimeString, getDateString } from "../../common_modules/common_modules";
 
 export class ScheduleBar extends HTMLElement {
-    reservationId: string;
-    reservation: Reservation;
-    color: string;
+    reservationId?: string;
+    reservation?: Reservation;
 
-    constructor(args: { calendarDateElement: Element, reservation: Reservation, color: string }) {
+    loanerRentalReservationId?: string;
+    loanerRentalReservation?: LoanerRentalReservation;
+
+    color?: string;
+
+    constructor(args: { calendarDateElement: Element, reservation?: Reservation, loanerRentalReservation?: LoanerRentalReservation }) {
         super();
 
-        const { calendarDateElement, reservation, color } = args;
+        if (args) {
+            if (args.reservation) {
+                this.reservationId = args.reservation.id;
+                this.reservation = args.reservation;
+                this.color = args.reservation.scheduleBarColor ? args.reservation.scheduleBarColor : "green";
 
-        this.reservationId = reservation.id;
-        this.reservation = reservation;
-        this.setAttribute("data-reservation-id", this.reservationId);
-        this.color = color;
+                this.setAttribute("data-reservation-id", args.reservation.id);
+                const scheduleBarStyle = this.scheduleBarStyle({ calendarDateElement: args.calendarDateElement, reservation: this.reservation });
+                Object.assign(this.style, scheduleBarStyle);
 
-        const scheduleBarStyle = this.scheduleBarStyle({ calendarDateElement: calendarDateElement, reservation: reservation });
-        Object.assign(this.style, scheduleBarStyle);
+                const scheduleBarLabel: HTMLDivElement = this.scheduleBarLabel();
+                this.append(scheduleBarLabel);
 
-        const scheduleBarLabel: HTMLDivElement = this.scheduleBarLabel();
-        this.append(scheduleBarLabel);
+                this.addEventListener("contextmenu", this.contextmenuHandler, false);
+                this.addEventListener("click", this.reservationDetailsModalHandler, false);
+            } else if (args.loanerRentalReservation) {
+                this.loanerRentalReservationId = args.loanerRentalReservation.id;
+                this.loanerRentalReservation = args.loanerRentalReservation;
+                this.color = args.loanerRentalReservation.scheduleBarColor ? args.loanerRentalReservation.scheduleBarColor : "red";
 
-        this.addEventListener("contextmenu", this.contextmenuHandler, false);
-        this.addEventListener("click", this.reservationDetailsModalHandler, false);
+                this.setAttribute("data-loanerRentalReservation-id", args.loanerRentalReservation.id);
+                const scheduleBarStyle = this.scheduleBarStyle({ calendarDateElement: args.calendarDateElement, loanerRentalReservation: this.loanerRentalReservation });
+                Object.assign(this.style, scheduleBarStyle);
+
+                const scheduleBarLabel: HTMLDivElement = this.scheduleBarLabel();
+                this.append(scheduleBarLabel);
+            }
+        }
     }
 
     contextmenuHandler = {
@@ -45,7 +62,7 @@ export class ScheduleBar extends HTMLElement {
         }
     }
 
-    scheduleBarStyle = (args: { calendarDateElement: Element, reservation: Reservation }) => {
+    scheduleBarStyle = (args: { calendarDateElement: Element, reservation?: Reservation, loanerRentalReservation?: LoanerRentalReservation }) => {
         const { calendarDateElement, reservation } = args;
 
         const commonStyle = {
@@ -56,7 +73,7 @@ export class ScheduleBar extends HTMLElement {
             overflow: "hidden",
             backgroundColor: this.color,
             cursor: "default",
-            userSelect: "none"
+            userSelect: "none",
         }
 
         const calendarStartTimestamp: number = Number(calendarDateElement.getAttribute("calendar-start-timestamp"));
@@ -64,8 +81,16 @@ export class ScheduleBar extends HTMLElement {
 
         const totalMsOfCalendar: number = calendarEndTimestamp - calendarStartTimestamp;
 
-        const pickupDatetimeMs: number = new Date(reservation.pickupDatetime).getTime();
-        const returnDatetimeMs: number = new Date(reservation.returnDatetime).getTime();
+        let pickupDatetimeMs: number
+        let returnDatetimeMs: number
+
+        if (args && args.reservation) {
+            pickupDatetimeMs = new Date(reservation.pickupDatetime).getTime();
+            returnDatetimeMs = new Date(reservation.returnDatetime).getTime();
+        } else if (args.loanerRentalReservation) {
+            pickupDatetimeMs = new Date(args.loanerRentalReservation.dispatchDatetime).getTime();
+            returnDatetimeMs = new Date(args.loanerRentalReservation.limitDate).getTime();
+        }
 
         const diffInTimeOfReservation: number = returnDatetimeMs - pickupDatetimeMs;
         const diffFromStart = `${((pickupDatetimeMs - calendarStartTimestamp) / totalMsOfCalendar) * 100}%`;
@@ -133,10 +158,6 @@ export class ScheduleBar extends HTMLElement {
             gridColumn: "1",
             gridRow: "1",
         });
-        const pickupTimeDateObject: Date = new Date(this.reservation.pickupDatetime);
-        const pickupDateString: string = getDateString({ dateObject: pickupTimeDateObject });
-        const pickupTimeString: string = getTimeString({ dateObject: pickupTimeDateObject });
-        pickupTimeDiv.textContent = date ? `${pickupDateString} ${pickupTimeString}` : pickupTimeString;
 
         const pickupLocationDiv: HTMLDivElement = document.createElement("div");
         Object.assign(pickupLocationDiv.style, {
@@ -145,7 +166,6 @@ export class ScheduleBar extends HTMLElement {
             gridRow: "1",
             marginLeft: "5px"
         });
-        pickupLocationDiv.textContent = this.reservation.pickupLocation;
 
         const returnTimeDiv: HTMLDivElement = document.createElement("div");
         Object.assign(returnTimeDiv.style, {
@@ -153,10 +173,6 @@ export class ScheduleBar extends HTMLElement {
             gridColumn: "1",
             gridRow: "2"
         });
-        const returnDateObject: Date = new Date(this.reservation.returnDatetime);
-        const returnDateString: string = getDateString({ dateObject: returnDateObject });
-        const returnTimeString: string = getTimeString({ dateObject: returnDateObject });
-        returnTimeDiv.textContent = date ? `${returnDateString} ${returnTimeString}` : returnTimeString;
 
         const returnLocationDiv: HTMLDivElement = document.createElement("div");
         Object.assign(returnLocationDiv.style, {
@@ -165,9 +181,37 @@ export class ScheduleBar extends HTMLElement {
             gridRow: "2",
             marginLeft: "5px"
         });
-        returnLocationDiv.textContent = this.reservation.returnLocation;
 
-        timeAndLocationContainer.append(pickupTimeDiv, pickupLocationDiv, returnTimeDiv, returnLocationDiv);
+        if (this.reservation) {
+            const pickupTimeDateObject: Date = new Date(this.reservation.pickupDatetime);
+            const pickupDateString: string = getDateString({ dateObject: pickupTimeDateObject });
+            const pickupTimeString: string = getTimeString({ dateObject: pickupTimeDateObject });
+            pickupTimeDiv.textContent = date ? `${pickupDateString} ${pickupTimeString}` : pickupTimeString;
+
+            pickupLocationDiv.textContent = this.reservation.pickupLocation;
+
+            const returnDateObject: Date = new Date(this.reservation.returnDatetime);
+            const returnDateString: string = getDateString({ dateObject: returnDateObject });
+            const returnTimeString: string = getTimeString({ dateObject: returnDateObject });
+            returnTimeDiv.textContent = date ? `${returnDateString} ${returnTimeString}` : returnTimeString;
+
+            returnLocationDiv.textContent = this.reservation.returnLocation;
+
+            timeAndLocationContainer.append(pickupTimeDiv, pickupLocationDiv, returnTimeDiv, returnLocationDiv);
+        } else if (this.loanerRentalReservation) {
+            const dispatchDatetimeObject: Date = new Date(this.loanerRentalReservation.dispatchDatetime);
+            const dispatchTimeString: string = getTimeString({ dateObject: dispatchDatetimeObject });
+
+            const limitDateObject: Date = new Date(this.loanerRentalReservation.limitDate);
+            const limitDateString: string = `限度日: ${getDateString({ dateObject: limitDateObject })}`;
+
+            pickupTimeDiv.textContent = dispatchTimeString;
+            returnTimeDiv.textContent = limitDateString;
+
+            timeAndLocationContainer.append(pickupTimeDiv, returnTimeDiv);
+        }
+
+
 
         return timeAndLocationContainer;
     }
@@ -179,7 +223,9 @@ export class ScheduleBar extends HTMLElement {
             marginLeft: "5px"
         });
 
-        reservationNameContainer.textContent = `${this.reservation.userName} 様`;
+        if (this.reservation) {
+            reservationNameContainer.textContent = `${this.reservation.userName} 様`;
+        }
 
         return reservationNameContainer;
     }

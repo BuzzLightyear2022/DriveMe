@@ -7,7 +7,7 @@ export type Windows = {
     reservationHandlerWindow: BrowserWindow,
     displayReservationWindow: BrowserWindow,
     rentalcarStatusHandlerWindow: BrowserWindow,
-    loanerRentalHandlerWindow: BrowserWindow
+    loanerRentalReservationHandlerWindow: BrowserWindow
 }
 
 export type CarCatalog = {
@@ -90,6 +90,7 @@ export type Reservation = {
     comment: string,
     isCanceled: boolean,
     cancelComment: string,
+    scheduleBarColor: string,
     createdAt: datetime,
     updatedAt: datetime
 }
@@ -112,6 +113,7 @@ export type LoanerRentalReservation = {
     dispatchLocation: string,
     remarks: string,
     insuranceProvider: string,
+    insuranceProviderCoordinator: string,
     insuranceProviderPhone: string,
     repairFacility: string,
     repairFacilityRepresentative: string,
@@ -131,6 +133,7 @@ export type LoanerRentalReservation = {
     selectedRentalClass: string,
     selectedCarModel: string,
     selectedRentalcarId: string,
+    scheduleBarColor: string,
     isCanceled: boolean
 }
 

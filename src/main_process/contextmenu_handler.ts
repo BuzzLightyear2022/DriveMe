@@ -68,7 +68,7 @@ export class ContextmenuHandler {
                 {
                     label: "新規損保予約",
                     click: async () => {
-                        WindowHandler.createLoanerRentalHandlerWindow({ rentalCarId: rentalCarId, crudAction: "create" });
+                        WindowHandler.createLoanerRentalReservationHandlerWindow({ rentalCarId: rentalCarId, crudAction: "create" });
                     }
                 },
                 {

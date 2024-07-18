@@ -3,6 +3,7 @@ import { setRadioValue, getRadioValue, convertToKatakana, replaceFullWidthNumToH
 import { rentalCarOptionsHandler } from "./common_modules/rentalCar_options_handler";
 
 const titleElement: HTMLElement = document.querySelector("#title-element");
+const scheduleBarColorInput: HTMLInputElement = document.querySelector("#schedulebar-color");
 const isRepliedCheck: HTMLInputElement = document.querySelector("#replied-check");
 const receptionDateInput: HTMLInputElement = document.querySelector("#reception-date");
 const repliedDateInput: HTMLInputElement = document.querySelector("#replied-date");
@@ -33,7 +34,7 @@ const departureFlightNumberInput: HTMLInputElement = document.querySelector("#de
 const departureFlightTimeInput: HTMLInputElement = document.querySelector("#departure-flight-time");
 const rentalClassSelect: HTMLSelectElement = document.querySelector("#rental-class");
 const carModelSelect: HTMLSelectElement = document.querySelector("#car-model");
-const rentalCarIdSelect: HTMLSelectElement = document.querySelector("#rentalCar-id");
+const rentalCarIdSelect: HTMLSelectElement = document.querySelector("#rentalcar-id");
 const commentTextArea: HTMLTextAreaElement = document.querySelector("#comment-textarea");
 
 const submitButton: HTMLButtonElement = document.querySelector("#submit-button");
@@ -102,6 +103,13 @@ const validateDateInput = () => {
 const populateFormInputs = async (args: { reservationId: string, carCatalog: CarCatalog }) => {
     const { reservationId, carCatalog } = args;
     const existingReservationData: Reservation = await window.sqlSelect.reservationById({ reservationId: reservationId });
+
+    if (existingReservationData && existingReservationData.scheduleBarColor) {
+        scheduleBarColorInput.value = existingReservationData.scheduleBarColor;
+    } else {
+        scheduleBarColorInput.value = "#008000";
+    }
+
 
     isRepliedCheck.checked = existingReservationData.isReplied;
 
@@ -206,6 +214,7 @@ const getSubmitData = (args: { crudArgs: any }): Reservation => {
         comment: commentTextArea.value,
         isCanceled: false,
         cancelComment: null,
+        scheduleBarColor: scheduleBarColorInput.value,
         createdAt: null,
         updatedAt: null
     }
@@ -310,6 +319,8 @@ convertToKatakana(furiganaInput);
         case "create":
             titleElement.textContent = "予約情報を入力してください";
             submitButton.textContent = "予約確定";
+
+            scheduleBarColorInput.value = "#008000";
 
             const now: Date = new Date();
             const todayString: string = formatDateForInput({ dateObject: now });

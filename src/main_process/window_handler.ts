@@ -24,7 +24,7 @@ export class WindowHandler {
         reservationHandlerWindow: undefined,
         displayReservationWindow: undefined,
         rentalcarStatusHandlerWindow: undefined,
-        loanerRentalHandlerWindow: undefined
+        loanerRentalReservationHandlerWindow: undefined
     }
 
     static createLoginWindow = () => {
@@ -141,7 +141,7 @@ export class WindowHandler {
         });
     }
 
-    static createLoanerRentalHandlerWindow = (args: { rentalCarId?: string, reservationId?: string, crudAction: string }) => {
+    static createLoanerRentalReservationHandlerWindow = (args: { rentalCarId?: string, reservationId?: string, crudAction: string }) => {
         const win: BrowserWindow = new BrowserWindow({
             width: 1000,
             height: 800,
@@ -155,10 +155,10 @@ export class WindowHandler {
             win.webContents.openDevTools();
 
             win.loadURL(new URL("html/loaner_rental_handler.html", MAIN_WINDOW_VITE_DEV_SERVER_URL).href);
-            WindowHandler.windows.loanerRentalHandlerWindow = win;
+            WindowHandler.windows.loanerRentalReservationHandlerWindow = win;
         } else {
             win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/loaner_rental_handler.html`));
-            WindowHandler.windows.loanerRentalHandlerWindow = win;
+            WindowHandler.windows.loanerRentalReservationHandlerWindow = win;
         }
 
         win.webContents.on("dom-ready", () => {
@@ -166,7 +166,7 @@ export class WindowHandler {
         });
 
         win.on("close", () => {
-            WindowHandler.windows.loanerRentalHandlerWindow = undefined;
+            WindowHandler.windows.loanerRentalReservationHandlerWindow = undefined;
         });
     }
 

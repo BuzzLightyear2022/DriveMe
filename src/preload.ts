@@ -9,7 +9,8 @@ import {
     LicensePlate,
     Reservation,
     CarLocation,
-    RentalCarStatus
+    RentalCarStatus,
+    LoanerRentalReservation
 } from "./@types/types";
 // import { generateUniqueId } from "./renderer_process/common_modules/common_modules";
 
@@ -111,6 +112,9 @@ contextBridge.exposeInMainWorld(
         },
         latestStatusOfRentalCars: async (args: { rentalClass?: string }) => {
             return await ipcRenderer.invoke("sqlSelect:latestStatusOfRentalCars", args);
+        },
+        loanerRentalReservations: async (args: { startDate?: Date, endDate?: Date }) => {
+            return await ipcRenderer.invoke("sqlSelect:loanerRentalReservations", args);
         }
     }
 );
@@ -126,6 +130,9 @@ contextBridge.exposeInMainWorld(
         },
         rentalCarStatus: async (args: { rentalCarStatus: RentalCarStatus }) => {
             return await ipcRenderer.invoke("sqlInsert:rentalCarStatus", args);
+        },
+        loanerRentalReservation: async (args: { loanerRentalReservation: LoanerRentalReservation }) => {
+            return await ipcRenderer.invoke("sqlInsert:loanerRentalReservation", args);
         }
     }
 );

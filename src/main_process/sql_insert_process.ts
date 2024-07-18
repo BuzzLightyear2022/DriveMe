@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import axios, { AxiosResponse } from "axios";
 import FormData from "form-data";
-import { RentalCar, Reservation, RentalCarStatus } from "../@types/types";
+import { RentalCar, Reservation, RentalCarStatus, LoanerRentalReservation } from "../@types/types";
 import { makeImageFileName } from "./common_modules";
 import { accessToken } from "./login_process";
 import { WindowHandler } from "./window_handler";
@@ -121,4 +121,27 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
             console.error(error);
         }
     });
-})()
+})();
+
+(async () => {
+    ipcMain.handle("sqlInsert:loanerRentalReservation", async (event: Electron.IpcMainEvent, args: { loanerRentalReservation: LoanerRentalReservation }) => {
+        const serverEndPoint = `https://${serverHost}:${port}/sqlInsert/loanerRentalReservation`;
+
+        try {
+            const response: AxiosResponse = await axios.post(serverEndPoint, args, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": accessToken
+                },
+                withCredentials: true
+            });
+
+            if (response.status === 200) {
+                WindowHandler.windows.loanerRentalHandlerWindow.close();
+                WindowHandler.windows.loanerRentalHandlerWindow = undefined;
+            }
+        } catch (error: unknown) {
+            console.error(error);
+        }
+    });
+})();

@@ -1,9 +1,10 @@
-import { CarCatalog, LoanerRentalReservation } from "../@types/types";
+import { CarCatalog, LoanerRentalReservation, RentalCar } from "../@types/types";
 import { asyncAppendOptions } from "./common_modules/async_append_options";
 import { formatDateForInput } from "./common_modules/format_date_for_input";
 import { rentalCarOptionsHandler } from "./common_modules/rentalCar_options_handler";
 import { getRadioValue } from "./common_modules/get_radio_value";
 
+const titleElement: HTMLElement = document.querySelector("#title-element");
 const receptionDateInput: HTMLInputElement = document.querySelector("#reception-date-input");
 const receptionBranchSelect: HTMLSelectElement = document.querySelector("#reception-branch-select");
 const receptionHandlerSelect: HTMLSelectElement = document.querySelector("#reception-handler-select");
@@ -45,10 +46,9 @@ const submitButton: HTMLButtonElement = document.querySelector("#submit-button")
 
 const getSubmitData = (): LoanerRentalReservation => {
     let nonSmoking: boolean = getRadioValue({ radios: nonSmokingRadios }) as boolean;
-
     return {
         id: null,
-        receptionDate: new Date(receptionDateInput.value),
+        receptionDate: receptionDateInput.value ? new Date(receptionDateInput.value) : null,
         receptionBranch: receptionBranchSelect.value,
         receptionHandler: receptionHandlerSelect.value,
         clientName: clientNameSelect.value,
@@ -60,16 +60,17 @@ const getSubmitData = (): LoanerRentalReservation => {
         phoneNumberFirst: phoneNumberFirstInput.value,
         phoneNumberSecond: phoneNumberSecondInput.value,
         phoneNumberThird: phoneNumberThirdInput.value,
-        dispatchDatetime: new Date(dispatchDatetimeInput.value),
+        dispatchDatetime: dispatchDatetimeInput.value ? new Date(dispatchDatetimeInput.value) : null,
         dispatchLocation: dispatchLocationInput.value,
         remarks: remarksInput.value,
         insuranceProvider: insuranceProviderInput.value,
+        insuranceProviderCoordinator: insuranceProviderCoordinatorInput.value,
         insuranceProviderPhone: insuranceProviderPhoneInput.value,
         repairFacility: repairFacilityInput.value,
         repairFacilityRepresentative: repairFacilityRepresentativeInput.value,
         repairFacilityPhone: repairFacilityPhoneInput.value,
         caseNumber: caseNumberInput.value,
-        accidentDate: new Date(accidentDateInput.value),
+        accidentDate: accidentDateInput.value ? new Date(accidentDateInput.value) : null,
         policyNumber: policyNumberInput.value,
         coverageCategory: coverageCategorySelect.value,
         dailyAmount: Number(dailyAmountInput.value),
@@ -79,18 +80,49 @@ const getSubmitData = (): LoanerRentalReservation => {
         pickupLocation: pickupLocationInput.value,
         ownedCar: ownedCarInput.value,
         transportLocation: transportLocationInput.value,
-        limitDate: new Date(limitDateInput.value),
+        limitDate: limitDateInput.value ? new Date(limitDateInput.value) : null,
         selectedRentalClass: rentalClass.value,
         selectedCarModel: carModel.value,
         selectedRentalcarId: rentalCarId.value,
+        scheduleBarColor: null,
         isCanceled: false
     }
 }
 
+const clientNameSelectHandler = () => {
+    if (clientNameSelect.value === "other") {
+        const clientNameRow: HTMLDivElement = document.querySelector("#client-name-row");
+
+        const col: HTMLDivElement = document.createElement("div");
+        col.id = "other-client-name-col";
+        col.className = "col mb-1";
+
+        const formFloating: HTMLDivElement = document.createElement("div");
+        formFloating.className = "form-floating";
+
+        const label: HTMLLabelElement = document.createElement("label");
+        label.textContent = "その他損保会社・代理店";
+        label.htmlFor = "other-client-name-input";
+
+        const input: HTMLInputElement = document.createElement("input");
+        input.className = "form-control";
+        input.id = "other-client-name-input";
+
+        formFloating.append(input, label);
+        col.append(formFloating);
+        clientNameRow.append(col);
+
+        input.focus();
+    } else {
+        const otherClientNameCol: HTMLDivElement = document.querySelector("#other-client-name-col");
+        if (otherClientNameCol) {
+            otherClientNameCol.remove();
+        }
+    }
+}
+
 (async () => {
-    const now = new Date();
-    const todayString: string = formatDateForInput({ dateObject: now });
-    receptionDateInput.value = todayString;
+    const crudArgs = await window.contextmenu.getCrudArgs();
 
     const selectOptions = await window.fetchJson.selectOptions();
     const carCatalog: CarCatalog = await window.fetchJson.carCatalog();
@@ -108,37 +140,7 @@ const getSubmitData = (): LoanerRentalReservation => {
     otherOption.value = "other";
     clientNameSelect.append(otherOption);
 
-    clientNameSelect.addEventListener("change", () => {
-        if (clientNameSelect.value === "other") {
-            const clientNameRow: HTMLDivElement = document.querySelector("#client-name-row");
-
-            const col: HTMLDivElement = document.createElement("div");
-            col.id = "other-client-name-col";
-            col.className = "col mb-1";
-
-            const formFloating: HTMLDivElement = document.createElement("div");
-            formFloating.className = "form-floating";
-
-            const label: HTMLLabelElement = document.createElement("label");
-            label.textContent = "その他損保会社・代理店";
-            label.htmlFor = "other-client-name-input";
-
-            const input: HTMLInputElement = document.createElement("input");
-            input.className = "form-control";
-            input.id = "other-client-name-input";
-
-            formFloating.append(input, label);
-            col.append(formFloating);
-            clientNameRow.append(col);
-
-            input.focus();
-        } else {
-            const otherClientNameCol: HTMLDivElement = document.querySelector("#other-client-name-col");
-            if (otherClientNameCol) {
-                otherClientNameCol.remove();
-            }
-        }
-    }, false)
+    clientNameSelect.addEventListener("change", clientNameSelectHandler, false);
 
     const rentalClasses: string[] = Object.keys(carCatalog.rentalClasses);
     const carModels: string[] = rentalClasses.flatMap((rentalClass: string) => {
@@ -148,9 +150,26 @@ const getSubmitData = (): LoanerRentalReservation => {
     await asyncAppendOptions({ options: carModels, select: carModelSelect });
 
     rentalCarOptionsHandler({});
+
+    switch (crudArgs.crudAction) {
+        case "create":
+            titleElement.textContent = "損保予約情報を入力してください";
+
+            if (crudArgs && crudArgs.rentalCarId) {
+                rentalCarOptionsHandler({ rentalCarId: crudArgs.rentalCarId });
+            }
+
+            const now = new Date();
+            const todayString: string = formatDateForInput({ dateObject: now });
+            receptionDateInput.value = todayString;
+            break;
+        case "update":
+
+            break;
+    }
 })();
 
 submitButton.addEventListener("click", () => {
     const submitData: LoanerRentalReservation = getSubmitData();
-    console.log(submitData);
+    window.sqlInsert.loanerRentalReservation({ loanerRentalReservation: submitData });
 }, false);

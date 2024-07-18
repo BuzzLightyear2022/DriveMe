@@ -1,4 +1,4 @@
-import { RentalCar } from "./types";
+import { LoanerRentalReservation, RentalCar } from "./types";
 
 export interface serverInfo {
     serverHost: () => Promise<string>;
@@ -41,12 +41,14 @@ export interface sqlSelect {
     reservations: (args: { startDate?: Date, endDate?: Date }) => Promise<Reservation[]>;
     reservationById: (args: { reservationId: string }) => Promise<Reservation>;
     latestStatusOfRentalCars: (args: { rentalClass?: string }) => Promise<StatusOfRentalCar[]>;
+    loanerRentalReservations: (args: { startDate?: Date, endDate?: Date }) => Promise<LoanerRentalReservation[]>;
 }
 
 export interface sqlInsert {
     rentalcar: (args: { rentalcar: RentalCar }) => Promise<string>;
     reservation: (reservation: Reservation) => Promise<string>;
     rentalCarStatus: (args: { rentalCarStatus: RentalCarStatus }) => Promise<void>;
+    loanerRentalReservation: (args: { loanerRentalReservation: LoanerRentalReservation }) => Promise<void>;
 }
 
 export interface sqlUpdate {
