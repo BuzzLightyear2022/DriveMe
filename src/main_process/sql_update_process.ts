@@ -2,7 +2,7 @@ import { ipcMain } from "electron";
 import axios, { AxiosResponse } from "axios";
 import FormData from "form-data";
 import { makeImageFileName } from "./common_modules/makeImageFIleName";
-import { RentalCar, Reservation } from "../@types/types";
+import { LoanerRentalReservation, RentalCar, Reservation } from "../@types/types";
 import { accessToken } from "./login_process";
 import { WindowHandler } from "./window_handler";
 import dotenv from "dotenv";
@@ -116,5 +116,31 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
         } catch (error: unknown) {
             return `Failed to update reservation data ${error}`;
         }
+    });
+})();
+
+(async () => {
+    ipcMain.on("sqlUpdate:loanerRentalReservation", async (event: Electron.IpcMainInvokeEvent, data: LoanerRentalReservation) => {
+        const serverEndPoint = `https://${serverHost}:${port}/sqlUpdate/loanerRentalReservation`;
+
+        const postData: FormData = new FormData();
+        postData.append("data", JSON.stringify(data));
+
+        try {
+            const response: AxiosResponse = await axios.post(serverEndPoint, postData, {
+                headers: {
+                    ...postData.getHeaders(),
+                    "Authorization": accessToken
+                },
+                withCredentials: true
+            });
+
+            if (response.status === 200) {
+                WindowHandler.windows.loanerRentalReservationHandlerWindow.close();
+            }
+        } catch (error: unknown) {
+            console.error(error);
+        }
+
     });
 })();

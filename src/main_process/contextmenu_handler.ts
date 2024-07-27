@@ -89,11 +89,27 @@ export class ContextmenuHandler {
                 {
                     label: "予約変更",
                     click: async () => WindowHandler.createReservationHandlerWindow({ reservationId: reservationId, crudAction: "update" }),
-
                 },
                 {
                     label: "キャンセル",
                     click: async () => WindowHandler.createReservationHandlerWindow({ reservationId: reservationId, crudAction: "cancel" })
+                }
+            ]);
+
+            menuTemplate.popup();
+        });
+    }
+
+    static displayLoanerRentalScheduleBarMenu = () => {
+        ipcMain.on("contextmenu:loanerRental-schedulebar", (event: Electron.IpcMainEvent, loanerRentalReservationId: string) => {
+            const menuTemplate = Menu.buildFromTemplate([
+                {
+                    label: "損保予約変更",
+                    click: async () => WindowHandler.createLoanerRentalReservationHandlerWindow({ reservationId: loanerRentalReservationId, crudAction: "update" })
+                },
+                {
+                    label: "キャンセル",
+                    click: async () => WindowHandler.createLoanerRentalReservationHandlerWindow({ reservationId: loanerRentalReservationId, crudAction: "cancel" })
                 }
             ]);
 

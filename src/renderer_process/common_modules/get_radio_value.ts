@@ -1,7 +1,7 @@
-export const getRadioValue = (args: { radios: NodeListOf<HTMLElement>, defaultValue?: string | boolean }): string | boolean | undefined => {
+export const getRadioValue = (args: { radios: NodeListOf<HTMLElement>, defaultValue?: string }): string => {
     const { radios, defaultValue } = args;
 
-    let selectedValue: string | boolean | undefined = defaultValue;
+    let selectedValue: string = defaultValue;
     radios.forEach((radio: HTMLInputElement): void => {
         if (radio.checked) {
             selectedValue = radio.value;

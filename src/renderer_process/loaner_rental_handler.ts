@@ -1,17 +1,20 @@
 import { CarCatalog, LoanerRentalReservation, RentalCar } from "../@types/types";
 import { asyncAppendOptions } from "./common_modules/async_append_options";
 import { formatDateForInput } from "./common_modules/format_date_for_input";
+import { formatDatetimeForInput } from "./common_modules/format_datetime_for_input";
 import { rentalCarOptionsHandler } from "./common_modules/rentalCar_options_handler";
 import { getRadioValue } from "./common_modules/get_radio_value";
+import { setRadioValue } from "./common_modules/set_radio_value";
 
 const titleElement: HTMLElement = document.querySelector("#title-element");
+const scheduleBarColorInput: HTMLInputElement = document.querySelector("#schedulebar-color");
 const receptionDateInput: HTMLInputElement = document.querySelector("#reception-date-input");
 const receptionBranchSelect: HTMLSelectElement = document.querySelector("#reception-branch-select");
 const receptionHandlerSelect: HTMLSelectElement = document.querySelector("#reception-handler-select");
 const clientNameSelect: HTMLSelectElement = document.querySelector("#client-name-select");
 const contactPersonNameInput: HTMLInputElement = document.querySelector("#contact-person-name-input");
 const userName1Input: HTMLInputElement = document.querySelector("#user-name1-input");
-const nonSmokingRadios: NodeListOf<HTMLElement> = document.getElementsByName("non-smoking");
+const nonSmokingRadios: NodeListOf<HTMLInputElement> = document.getElementsByName("non-smoking") as NodeListOf<HTMLInputElement>;
 const carModelSelect: HTMLSelectElement = document.querySelector("#using-car-model-select");
 const usingCarModelSelect: HTMLSelectElement = document.querySelector("#using-car-model-select");
 const contactTypeSelect: HTMLSelectElement = document.querySelector("#contact-type-select");
@@ -44,10 +47,10 @@ const carModel: HTMLSelectElement = document.querySelector("#car-model");
 const rentalCarId: HTMLSelectElement = document.querySelector("#rentalcar-id");
 const submitButton: HTMLButtonElement = document.querySelector("#submit-button");
 
-const getSubmitData = (): LoanerRentalReservation => {
-    let nonSmoking: boolean = getRadioValue({ radios: nonSmokingRadios }) as boolean;
+const getSubmitData = (args?: { reservationId?: string }): LoanerRentalReservation => {
+    let nonSmoking: string = getRadioValue({ radios: nonSmokingRadios });
     return {
-        id: null,
+        id: args && args.reservationId ? args.reservationId : null,
         receptionDate: receptionDateInput.value ? new Date(receptionDateInput.value) : null,
         receptionBranch: receptionBranchSelect.value,
         receptionHandler: receptionHandlerSelect.value,
@@ -84,7 +87,7 @@ const getSubmitData = (): LoanerRentalReservation => {
         selectedRentalClass: rentalClass.value,
         selectedCarModel: carModel.value,
         selectedRentalcarId: rentalCarId.value,
-        scheduleBarColor: null,
+        scheduleBarColor: scheduleBarColorInput.value,
         isCanceled: false
     }
 }
@@ -149,7 +152,7 @@ const clientNameSelectHandler = () => {
     });
     await asyncAppendOptions({ options: carModels, select: carModelSelect });
 
-    rentalCarOptionsHandler({});
+    await rentalCarOptionsHandler({});
 
     switch (crudArgs.crudAction) {
         case "create":
@@ -162,14 +165,65 @@ const clientNameSelectHandler = () => {
             const now = new Date();
             const todayString: string = formatDateForInput({ dateObject: now });
             receptionDateInput.value = todayString;
+
+            scheduleBarColorInput.value = "#ff0000";
+
+            submitButton.addEventListener("click", () => {
+                const submitData: LoanerRentalReservation = getSubmitData();
+                window.sqlInsert.loanerRentalReservation({ loanerRentalReservation: submitData });
+            }, false);
+
             break;
         case "update":
+            titleElement.textContent = "損保予約情報を更新します";
+
+            const existingLoanerRentalReservation: LoanerRentalReservation = await window.sqlSelect.loanerRentalReservationById({ reservationId: crudArgs.reservationId });
+            console.log(existingLoanerRentalReservation);
+
+            scheduleBarColorInput.value = existingLoanerRentalReservation.scheduleBarColor ? existingLoanerRentalReservation.scheduleBarColor : "#ff0000";
+            receptionDateInput.value = formatDateForInput({ dateObject: new Date(existingLoanerRentalReservation.receptionDate) });
+            receptionBranchSelect.value = existingLoanerRentalReservation.receptionBranch;
+            receptionHandlerSelect.value = existingLoanerRentalReservation.receptionHandler;
+            clientNameSelect.value = existingLoanerRentalReservation.clientName;
+            contactPersonNameInput.value = existingLoanerRentalReservation.contactPersonName;
+            setRadioValue({ radios: nonSmokingRadios, checkedValue: existingLoanerRentalReservation.nonSmoking });
+            userName1Input.value = existingLoanerRentalReservation.userName1;
+            carModelSelect.value = existingLoanerRentalReservation.usingCarModel;
+            contactTypeSelect.value = existingLoanerRentalReservation.contactType;
+            phoneNumberFirstInput.value = existingLoanerRentalReservation.phoneNumberFirst;
+            phoneNumberSecondInput.value = existingLoanerRentalReservation.phoneNumberSecond;
+            phoneNumberThirdInput.value = existingLoanerRentalReservation.phoneNumberThird;
+            dispatchDatetimeInput.value = formatDatetimeForInput({ dateObject: new Date(existingLoanerRentalReservation.dispatchDatetime) });
+            dispatchLocationInput.value = existingLoanerRentalReservation.dispatchLocation;
+            remarksInput.value = existingLoanerRentalReservation.remarks;
+            insuranceProviderInput.value = existingLoanerRentalReservation.insuranceProvider;
+            insuranceProviderCoordinatorInput.value = existingLoanerRentalReservation.insuranceProviderCoordinator;
+            insuranceProviderPhoneInput.value = existingLoanerRentalReservation.insuranceProviderPhone;
+            repairFacilityInput.value = existingLoanerRentalReservation.repairFacility;
+            repairFacilityRepresentativeInput.value = existingLoanerRentalReservation.repairFacilityRepresentative;
+            repairFacilityPhoneInput.value = existingLoanerRentalReservation.repairFacilityPhone;
+            caseNumberInput.value = existingLoanerRentalReservation.caseNumber;
+            accidentDateInput.value = existingLoanerRentalReservation.accidentDate ? formatDateForInput({ dateObject: new Date(existingLoanerRentalReservation.accidentDate) }) : null;
+            policyNumberInput.value = existingLoanerRentalReservation.policyNumber;
+            coverageCategorySelect.value = existingLoanerRentalReservation.coverageCategory;
+            dailyAmountInput.value = String(existingLoanerRentalReservation.dailyAmount);
+            recompenseCheck.checked = existingLoanerRentalReservation.recompense;
+            policyholderNameInput.value = existingLoanerRentalReservation.policyholderName;
+            userName2Input.value = existingLoanerRentalReservation.userName2;
+            pickupLocationInput.value = existingLoanerRentalReservation.pickupLocation;
+            ownedCarInput.value = existingLoanerRentalReservation.ownedCar;
+            transportLocationInput.value = existingLoanerRentalReservation.transportLocation;
+            limitDateInput.value = formatDateForInput({ dateObject: new Date(existingLoanerRentalReservation.limitDate) });
+            rentalClass.value = existingLoanerRentalReservation.selectedRentalClass;
+            carModel.value = existingLoanerRentalReservation.selectedCarModel;
+            rentalCarId.value = existingLoanerRentalReservation.selectedRentalcarId;
+
+            submitButton.addEventListener("click", () => {
+                const submitData: LoanerRentalReservation = getSubmitData({ reservationId: crudArgs.reservationId });
+                window.sqlUpdate.loanerRentalReservation(submitData);
+            });
 
             break;
     }
 })();
 
-submitButton.addEventListener("click", () => {
-    const submitData: LoanerRentalReservation = getSubmitData();
-    window.sqlInsert.loanerRentalReservation({ loanerRentalReservation: submitData });
-}, false);

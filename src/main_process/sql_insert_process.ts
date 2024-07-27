@@ -137,8 +137,7 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
             });
 
             if (response.status === 200) {
-                WindowHandler.windows.loanerRentalHandlerWindow.close();
-                WindowHandler.windows.loanerRentalHandlerWindow = undefined;
+                WindowHandler.windows.loanerRentalReservationHandlerWindow.close();
             }
         } catch (error: unknown) {
             console.error(error);

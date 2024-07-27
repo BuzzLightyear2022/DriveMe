@@ -42,6 +42,7 @@ export interface sqlSelect {
     reservationById: (args: { reservationId: string }) => Promise<Reservation>;
     latestStatusOfRentalCars: (args: { rentalClass?: string }) => Promise<StatusOfRentalCar[]>;
     loanerRentalReservations: (args: { startDate?: Date, endDate?: Date }) => Promise<LoanerRentalReservation[]>;
+    loanerRentalReservationById: (args: { reservationId: string }) => Promise<LoanerRentalReservation>;
 }
 
 export interface sqlInsert {
@@ -53,11 +54,13 @@ export interface sqlInsert {
 
 export interface sqlUpdate {
     reservation: (reservation: Reservation) => Promise<void>;
-    rentalcar: (args: { currentData: RentalCar, newData: RentalCar }) => Promise<void>
+    rentalcar: (args: { currentData: RentalCar, newData: RentalCar }) => Promise<void>;
+    loanerRentalReservation: (reservationData: LoanerRentalReservation) => Promise<void>;
 }
 
 export interface contextmenu {
     scheduleBar: (reservationId: string) => Promise<void>;
+    loanerRentalScheduleBar: (loanerRentalReservationId: string) => Promise<void>;
     rentalcarItem: (args: { rentalcarId: string }) => Promise<void>;
     scheduleCell: (args: { rentalCarId: string }) => Promise<void>;
     getReservationId: () => Promise<string>;

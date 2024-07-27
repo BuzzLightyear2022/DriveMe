@@ -15,7 +15,7 @@ export class MenubarHandler {
                 submenu: [
                     {
                         label: "新規予約",
-                        click: () => WindowHandler.createHandleReservationWindow({ crudAction: "create" })
+                        click: () => WindowHandler.createReservationHandlerWindow({ crudAction: "create" })
                     },
                     {
                         label: "予約一覧"
@@ -33,7 +33,7 @@ export class MenubarHandler {
                     },
                     {
                         label: "車両新規登録",
-                        click: () => WindowHandler.createInsertVehicleAttributesWindow()
+                        click: () => WindowHandler.createRentalcarHandlerWindow()
                     }
                 ]
             },

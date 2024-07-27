@@ -25,9 +25,6 @@ export class ScheduleBar extends HTMLElement {
 
                 const scheduleBarLabel: HTMLDivElement = this.scheduleBarLabel();
                 this.append(scheduleBarLabel);
-
-                this.addEventListener("contextmenu", this.contextmenuHandler, false);
-                this.addEventListener("click", this.reservationDetailsModalHandler, false);
             } else if (args.loanerRentalReservation) {
                 this.loanerRentalReservationId = args.loanerRentalReservation.id;
                 this.loanerRentalReservation = args.loanerRentalReservation;
@@ -40,13 +37,20 @@ export class ScheduleBar extends HTMLElement {
                 const scheduleBarLabel: HTMLDivElement = this.scheduleBarLabel();
                 this.append(scheduleBarLabel);
             }
+            this.addEventListener("contextmenu", this.contextmenuHandler, false);
+            this.addEventListener("click", this.reservationDetailsModalHandler, false);
         }
     }
 
     contextmenuHandler = {
-        handleEvent: (event: Event) => {
+        handleEvent: async (event: Event) => {
             event.stopPropagation();
-            window.contextmenu.scheduleBar(this.reservationId);
+
+            if (this.reservation) {
+                await window.contextmenu.scheduleBar(this.reservationId);
+            } else if (this.loanerRentalReservation) {
+                await window.contextmenu.loanerRentalScheduleBar(this.loanerRentalReservationId);
+            }
         }
     }
 
@@ -210,8 +214,6 @@ export class ScheduleBar extends HTMLElement {
 
             timeAndLocationContainer.append(pickupTimeDiv, returnTimeDiv);
         }
-
-
 
         return timeAndLocationContainer;
     }

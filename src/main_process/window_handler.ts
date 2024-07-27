@@ -63,6 +63,7 @@ export class WindowHandler {
         ContextmenuHandler.displayMenubarMenu();
         ContextmenuHandler.displayScheduleCellMenu();
         ContextmenuHandler.displayScheduleBarMenu();
+        ContextmenuHandler.displayLoanerRentalScheduleBarMenu();
         ContextmenuHandler.displayVehicleItemMenu();
 
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

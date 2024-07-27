@@ -15,8 +15,6 @@ import {
 // import { generateUniqueId } from "./renderer_process/common_modules/common_modules";
 
 const wsReservationUpdateListeners: any[] = [];
-const wsVehicleAttributesUpdateListeners: any[] = [];
-const wsVehicleStatusUpdateListeners: any[] = [];
 
 contextBridge.exposeInMainWorld(
     "serverInfo",
@@ -115,6 +113,9 @@ contextBridge.exposeInMainWorld(
         },
         loanerRentalReservations: async (args: { startDate?: Date, endDate?: Date }) => {
             return await ipcRenderer.invoke("sqlSelect:loanerRentalReservations", args);
+        },
+        loanerRentalReservationById: async (args: { reservationId: string }) => {
+            return await ipcRenderer.invoke("sqlSelect:loanerRentalReservationById", args);
         }
     }
 );
@@ -145,6 +146,9 @@ contextBridge.exposeInMainWorld(
         },
         rentalcar: async (args: { currentData: RentalCar, newData: RentalCar }): Promise<void> => {
             ipcRenderer.send("sqlUpdate:rentalcar", args);
+        },
+        loanerRentalReservation: async (reservationData: LoanerRentalReservation): Promise<void> => {
+            ipcRenderer.send("sqlUpdate:loanerRentalReservation", reservationData);
         }
     }
 );
@@ -154,6 +158,9 @@ contextBridge.exposeInMainWorld(
     {
         scheduleBar: async (reservationId: string) => {
             ipcRenderer.send("contextmenu:schedule-bar", reservationId);
+        },
+        loanerRentalScheduleBar: async (loanerRentalReservationId: string) => {
+            ipcRenderer.send("contextmenu:loanerRental-schedulebar", loanerRentalReservationId);
         },
         rentalcarItem: async (args: { rentalcarId: string }) => {
             ipcRenderer.send("contextmenu:rentalcarItem", args);

@@ -13,7 +13,7 @@ export class ScheduleCell extends HTMLElement {
 
         Object.assign(this.style, {
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             minHeight: `${rentalCarItemHeight}px`,
             maxHeight: `${rentalCarItemHeight}px`,
             border: "solid",

@@ -181,3 +181,23 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
         }
     });
 })();
+
+(async () => {
+    ipcMain.handle("sqlSelect:loanerRentalReservationById", async (event: Electron.IpcMainInvokeEvent, args: { reservationId: string }) => {
+        const serverEndPoint = `https://${serverHost}:${port}/sqlSelect/loanerRentalReservationById`;
+
+        try {
+            const response: AxiosResponse = await axios.post(serverEndPoint, args, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": accessToken
+                },
+                withCredentials: true
+            });
+
+            return response.data;
+        } catch (error: unknown) {
+            console.error(error);
+        }
+    });
+})();

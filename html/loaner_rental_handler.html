@@ -16,6 +16,12 @@
         <h1 id="title-element" class="title mt-4 mb-4"></h1>
 
         <div class="row">
+            <div class="col mb-1">
+                <input type="color" class="form-control form-control-color" id="schedulebar-color">
+            </div>
+        </div>
+
+        <div class="row">
             <div class="input-group mb-3">
                 <span class="input-group-text">受注日</span>
                 <input type="date" class="form-control" id="reception-date-input">
@@ -61,9 +67,9 @@
 
             <div class="col mb-1">
                 <div class="input-form mb-3">
-                    <input type="radio" class="btn-check" id="non-smoking-radio" name="non-smoking" value=true>
+                    <input type="radio" class="btn-check" id="non-smoking-radio" name="non-smoking" value="non-smoking">
                     <label for="non-smoking-radio" class="btn btn-outline-success">禁煙車</label>
-                    <input type="radio" class="btn-check" id="ok-smoking-radio" name="non-smoking" value=false>
+                    <input type="radio" class="btn-check" id="ok-smoking-radio" name="non-smoking" value="ok-smoking">
                     <label for="ok-smoking-radio" class="btn btn-outline-danger">喫煙車</label>
                 </div>
 
