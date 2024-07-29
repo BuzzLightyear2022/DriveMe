@@ -1,17 +1,15 @@
 import { RentalCar } from "../../@types/types";
 import { loadImage } from "../common_modules/common_modules";
 
-// export type VehicleItemType = InstanceType<typeof VehicleItem>;
-
 export const RentalCarItem = class extends HTMLElement {
-    static instances: HTMLElement[] = [];
+    // static instances: any[] = [];
 
     rentalCar: RentalCar;
 
     constructor(args: { rentalcar: RentalCar }) {
         super();
 
-        RentalCarItem.instances.push(this);
+        // RentalCarItem.instances.push(this);
 
         this.setAttribute("data-rentalCar-id", String(args.rentalcar.id));
 
@@ -37,9 +35,13 @@ export const RentalCarItem = class extends HTMLElement {
             this.append(imageDiv, textDiv);
         })();
 
-        this.addEventListener("contextmenu", () => {
-            window.contextmenu.rentalcarItem({ rentalcarId: args.rentalcar.id });
-        }, false)
+        const contextmenuEvent = {
+            handleEvent: (event: Event) => {
+                window.contextmenu.rentalcarItem({ rentalcarId: args.rentalcar.id });
+            }
+        }
+
+        this.addEventListener("contextmenu", contextmenuEvent, true);
     }
 
     imageDiv = async (args: { fileName: string | null }): Promise<HTMLDivElement> => {

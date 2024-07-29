@@ -41,12 +41,7 @@ export class RentalCarStatusElement extends HTMLElement {
             this.textContent = currentLocation + washState;
         }
 
-        const contextmenuHandler = {
-            handleEvent: () => {
-                window.contextmenu.scheduleCell({ rentalCarId: rentalCarStatus.rentalCarId });
-            }
-        }
-        this.addEventListener("contextmenu", contextmenuHandler, false);
+        this.style.pointerEvents = "none";
     }
 }
 

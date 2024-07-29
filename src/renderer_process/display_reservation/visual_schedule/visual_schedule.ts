@@ -53,8 +53,6 @@ export class VisualSchedule extends HTMLElement {
                     const scheduleCellRentalCarId: number = Number(scheduleCell.getAttribute("data-rentalCar-id"));
                     if (selectedVehicleId === scheduleCellRentalCarId && !reservation.isCanceled) {
                         const scheduleBar: ScheduleBar = new ScheduleBar({ calendarDateElement: calendarDateElement, reservation: reservation });
-                        // scheduleBar.style.height = `${100 / (scheduleCell.children.length + 1)}%`;
-                        // scheduleBar.style.top = `${Array.from(scheduleCell.children).length * 50}%`;
                         scheduleCell.appendChild(scheduleBar);
                     }
                 }
@@ -68,8 +66,6 @@ export class VisualSchedule extends HTMLElement {
                     const scheduleCellRentalcarId: number = Number(scheduleCell.getAttribute("data-rentalCar-id"));
                     if (selectedRentalcarId === scheduleCellRentalcarId && !loanerRentalReservation.isCanceled) {
                         const scheduleBar: ScheduleBar = new ScheduleBar({ calendarDateElement: calendarDateElement, loanerRentalReservation: loanerRentalReservation });
-                        // scheduleBar.style.height = `${100 / (scheduleCell.children.length + 1)}%`;
-                        // scheduleBar.style.top = `${Array.from(scheduleCell.children).length * 50}%`;
                         scheduleCell.appendChild(scheduleBar);
                     }
                 }

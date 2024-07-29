@@ -32,12 +32,6 @@ const appendRentalCarItems = async (args: { rentalcars: RentalCar[] }): Promise<
         }
 
         await new Promise((resolve) => { setTimeout(resolve, 1000) });
-
-        // await Promise.all(rentalCars.map(async (rentalCar: RentalCar) => {
-        //     const rentalCarItem: HTMLElement = new RentalCarItem({ rentalCar: rentalCar });
-        //     rentalCarItemsContainer.append(rentalCarItem);
-        //     await new Promise((resolve) => { setTimeout(resolve, 1000) });
-        // }));
     }
 }
 
@@ -62,7 +56,6 @@ const rentalCarStatusHandler = async (args: { rentalCars: RentalCar[] }) => {
         await Promise.all(rentalCars.map((rentalCar: RentalCar) => {
             if (rentalCarItemId === String(rentalCar.id)) {
                 if (rentalCar.RentalCarStatuses.length) {
-
                     const rentalCarItemWidth: number = rentalCarItem.getBoundingClientRect().width;
                     const centerPositionX = `${(visualScheduleContainerWidth / 2) + rentalCarItemWidth}px`;
 
