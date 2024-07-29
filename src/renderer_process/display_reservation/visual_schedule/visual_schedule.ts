@@ -20,6 +20,7 @@ export class VisualSchedule extends HTMLElement {
         (async () => {
             this.appendScheduleCells();
             await this.appendScheduleBars({ calendarDateElement: calendarDateElement });
+            this.adjustScheduleBars();
         })();
     }
 
@@ -52,6 +53,8 @@ export class VisualSchedule extends HTMLElement {
                     const scheduleCellRentalCarId: number = Number(scheduleCell.getAttribute("data-rentalCar-id"));
                     if (selectedVehicleId === scheduleCellRentalCarId && !reservation.isCanceled) {
                         const scheduleBar: ScheduleBar = new ScheduleBar({ calendarDateElement: calendarDateElement, reservation: reservation });
+                        // scheduleBar.style.height = `${100 / (scheduleCell.children.length + 1)}%`;
+                        // scheduleBar.style.top = `${Array.from(scheduleCell.children).length * 50}%`;
                         scheduleCell.appendChild(scheduleBar);
                     }
                 }
@@ -65,11 +68,56 @@ export class VisualSchedule extends HTMLElement {
                     const scheduleCellRentalcarId: number = Number(scheduleCell.getAttribute("data-rentalCar-id"));
                     if (selectedRentalcarId === scheduleCellRentalcarId && !loanerRentalReservation.isCanceled) {
                         const scheduleBar: ScheduleBar = new ScheduleBar({ calendarDateElement: calendarDateElement, loanerRentalReservation: loanerRentalReservation });
+                        // scheduleBar.style.height = `${100 / (scheduleCell.children.length + 1)}%`;
+                        // scheduleBar.style.top = `${Array.from(scheduleCell.children).length * 50}%`;
                         scheduleCell.appendChild(scheduleBar);
                     }
                 }
             }));
         }
+    }
+
+    adjustScheduleBars = (): void => {
+        const scheduleCells: NodeListOf<ScheduleCell> = this.querySelectorAll('schedule-cell');
+
+        scheduleCells.forEach(scheduleCell => {
+            const scheduleBars: NodeListOf<ScheduleBar> = scheduleCell.querySelectorAll('schedule-bar');
+            const positions: any[][] = [];
+
+            scheduleBars.forEach(scheduleBar => {
+                const barRect: DOMRect = scheduleBar.getBoundingClientRect();
+                let placed: boolean = false;
+
+                for (let rowIndex = 0; rowIndex < positions.length; rowIndex++) {
+                    if (!positions[rowIndex].some((pos: any) => this.areOverlapping(barRect, pos))) {
+                        positions[rowIndex].push(barRect);
+                        scheduleBar.dataset.rowIndex = rowIndex.toString();
+                        placed = true;
+                        break;
+                    }
+                }
+
+                if (!placed) {
+                    positions.push([barRect]);
+                    scheduleBar.dataset.rowIndex = (positions.length - 1).toString();
+                }
+
+                const maxRows = positions.length;
+
+                scheduleBars.forEach(scheduleBar => {
+                    const rowIndex = parseInt(scheduleBar.dataset.rowIndex, 10);
+                    scheduleBar.style.height = `${100 / maxRows}%`;
+                    scheduleBar.style.top = `${rowIndex * (100 / maxRows)}%`;
+                });
+            });
+        });
+    }
+
+    areOverlapping = (rect1: DOMRect, rect2: DOMRect): boolean => {
+        return !(rect1.right <= rect2.left ||
+            rect1.left >= rect2.right ||
+            rect1.bottom <= rect2.top ||
+            rect1.top >= rect2.bottom);
     }
 }
 

@@ -21,7 +21,8 @@ export class ScheduleCell extends HTMLElement {
             marginTop: "-1px",
             marginLeft: "-1px",
             whiteSpace: "nowrap",
-            overflow: "visible"
+            overflow: "visible",
+            position: "relative"
         });
 
         this.addEventListener("contextmenu", this.contextmenuHandler, false);

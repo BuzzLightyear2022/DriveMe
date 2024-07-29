@@ -72,7 +72,7 @@ export class ScheduleBar extends HTMLElement {
         const commonStyle = {
             display: "flex",
             flexDirection: "row",
-            position: "relative",
+            position: "absolute",
             whiteSpace: "nowrap",
             overflow: "hidden",
             backgroundColor: this.color,
