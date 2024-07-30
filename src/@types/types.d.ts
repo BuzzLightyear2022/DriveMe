@@ -2,12 +2,13 @@ import { Datetime } from "aws-sdk/clients/costoptimizationhub"
 import { time } from "aws-sdk/clients/frauddetector"
 
 export type Windows = {
-    loginWindow: BrowserWindow,
-    rentalcarHandlerWindow: BrowserWindow,
-    reservationHandlerWindow: BrowserWindow,
-    displayReservationWindow: BrowserWindow,
-    rentalcarStatusHandlerWindow: BrowserWindow,
-    loanerRentalReservationHandlerWindow: BrowserWindow
+    loginWindow: BrowserWindow | undefined,
+    rentalcarHandlerWindow: BrowserWindow | undefined,
+    reservationHandlerWindow: BrowserWindow | undefined,
+    displayReservationWindow: BrowserWindow | undefined,
+    rentalcarStatusHandlerWindow: BrowserWindow | undefined,
+    loanerRentalReservationHandlerWindow: BrowserWindow | undefined,
+    reservationListWindow: BrowserWindow | undefined
 }
 
 export type CarCatalog = {

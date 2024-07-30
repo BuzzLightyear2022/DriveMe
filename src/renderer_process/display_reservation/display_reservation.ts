@@ -4,6 +4,7 @@ import { CalendarDate } from "./calendar_date";
 import { VisualSchedule } from "./visual_schedule/visual_schedule";
 import { RentalCarStatusElement } from "./visual_schedule/rentalCar_status_element"
 
+let intersectionObserver: IntersectionObserver | null;
 const rentalClassSelect: HTMLSelectElement = document.querySelector("#rental-class-select");
 
 const appendRentalClassOptions = async (): Promise<void> => {
@@ -181,21 +182,25 @@ const handleDisplayMonth = () => {
     const calendarDateElements = dateContainer.children;
 
     const defineIntersectionObserver = (): IntersectionObserver => {
-        const dateContainerWidth: number = dateContainer.getBoundingClientRect().width;
-        const rootMargin = `0px -${dateContainerWidth}px 0px 0px`;
+        if (intersectionObserver) {
+            intersectionObserver.disconnect();
+        }
 
-        const intersectionObserver: IntersectionObserver = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+        const dateContainerWidth: number = dateContainer.getBoundingClientRect().width;
+
+        intersectionObserver = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
             entries.forEach((entry: IntersectionObserverEntry) => {
                 if (entry.isIntersecting) {
                     const calendarDateElement: Element = entry.target;
                     const targetCalendarStartTimestamp: number = Number(calendarDateElement.getAttribute("calendar-start-timestamp"));
                     const targetCalendarStartDate: Date = new Date(targetCalendarStartTimestamp);
                     monthDisplay.textContent = `${targetCalendarStartDate.getFullYear()}年${targetCalendarStartDate.getMonth() + 1}月`;
+                    console.log(`${targetCalendarStartDate.getFullYear()}年${targetCalendarStartDate.getMonth() + 1}月`);
                 }
             });
         }, {
             root: dateContainer,
-            rootMargin: `0px -${Math.round(dateContainerWidth)}px 0px 0px`
+            rootMargin: `0px -${Math.min(dateContainerWidth, window.innerWidth)}px 0px 0px`
         });
 
         for (const calendarDateElement of calendarDateElements) {

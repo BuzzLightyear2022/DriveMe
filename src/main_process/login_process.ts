@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain, dialog } from "electron";
 import axios, { AxiosResponse } from "axios";
 
 import { WindowHandler } from "./window_handler";
@@ -26,6 +26,16 @@ const serverEndPoint = `https://${serverHost}:${serverPort}/login/getSessionData
             WindowHandler.windows.loginWindow.close();
         } catch (error: any) {
             console.error(error);
+
+            if (error.response) {
+                if (error.response.status === 401) {
+                    dialog.showErrorBox("Authenticate Error", "ログインできません");
+                } else if (error.response.status === 403) {
+                    dialog.showErrorBox("Authenticate Error", "サーバー管理者に連絡してください");
+                }
+            } else {
+                dialog.showErrorBox("Connection Error", "サーバー管理者に連絡してください");
+            }
         }
     });
 })();

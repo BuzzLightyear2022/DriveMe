@@ -2,9 +2,9 @@ import { BrowserWindow, screen } from "electron";
 import path from "path";
 import { Windows } from "../@types/types";
 import { ContextmenuHandler } from "./contextmenu_handler";
-import { accessToken } from "./login_process";
+// import { accessToken } from "./login_process";
 import dotenv from "dotenv";
-import { external } from "vite.base.config";
+// import { external } from "vite.base.config";
 dotenv.config();
 
 const openInExtendedDisplay = (targetWindow: BrowserWindow) => {
@@ -24,7 +24,8 @@ export class WindowHandler {
         reservationHandlerWindow: undefined,
         displayReservationWindow: undefined,
         rentalcarStatusHandlerWindow: undefined,
-        loanerRentalReservationHandlerWindow: undefined
+        loanerRentalReservationHandlerWindow: undefined,
+        reservationListWindow: undefined
     }
 
     static createLoginWindow = () => {
@@ -198,6 +199,29 @@ export class WindowHandler {
             } else {
                 win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/rentalcar_status_handler.html`));
                 WindowHandler.windows.rentalcarStatusHandlerWindow = win;
+            }
+        }
+    }
+
+    static createReservationListWindow = (): void => {
+        if (!WindowHandler.windows.reservationListWindow) {
+            const win: BrowserWindow = new BrowserWindow({
+                webPreferences: {
+                    preload: WindowHandler.preloadScript
+                }
+            });
+
+            win.on("closed", () => {
+                WindowHandler.windows.reservationListWindow = undefined;
+            });
+
+            if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+                win.webContents.openDevTools();
+                win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/reservation_list.html`);
+                WindowHandler.windows.reservationListWindow = win;
+            } else {
+                win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/reservation_list.html`));
+                WindowHandler.windows.reservationListWindow = win;
             }
         }
     }

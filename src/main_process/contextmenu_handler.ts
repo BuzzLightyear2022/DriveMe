@@ -18,7 +18,8 @@ export class ContextmenuHandler {
                         click: () => WindowHandler.createReservationHandlerWindow({ crudAction: "create" })
                     },
                     {
-                        label: "予約一覧"
+                        label: "予約一覧",
+                        click: () => WindowHandler.createReservationListWindow()
                     },
                     {
                         label: "シミュレーションモード"
@@ -38,7 +39,17 @@ export class ContextmenuHandler {
                 ]
             },
             {
-                label: "表示"
+                label: "表示",
+                submenu: [
+                    {
+                        label: "ズームイン",
+                        role: "zoomIn"
+                    },
+                    {
+                        label: "ズームアウト",
+                        role: "zoomOut"
+                    }
+                ]
             },
             {
                 label: "ヘルプ"
