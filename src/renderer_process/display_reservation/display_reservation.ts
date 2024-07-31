@@ -195,7 +195,6 @@ const handleDisplayMonth = () => {
                     const targetCalendarStartTimestamp: number = Number(calendarDateElement.getAttribute("calendar-start-timestamp"));
                     const targetCalendarStartDate: Date = new Date(targetCalendarStartTimestamp);
                     monthDisplay.textContent = `${targetCalendarStartDate.getFullYear()}年${targetCalendarStartDate.getMonth() + 1}月`;
-                    console.log(`${targetCalendarStartDate.getFullYear()}年${targetCalendarStartDate.getMonth() + 1}月`);
                 }
             });
         }, {
@@ -365,4 +364,5 @@ const calendarInitializer = async () => {
     window.webSocket.updateReservationData(calendarUpdater);
     window.webSocket.updateRentalCarStatus(calendarUpdater);
     window.webSocket.updateRentalcar(calendarUpdater);
+    window.webSocket.reopen(calendarInitializer);
 })();

@@ -82,6 +82,11 @@ contextBridge.exposeInMainWorld(
 );
 
 contextBridge.exposeInMainWorld(
+    "closeWindow",
+    {}
+);
+
+contextBridge.exposeInMainWorld(
     "sqlSelect",
     {
         rentalCars: async (args: { rentalClass?: string | null }): Promise<RentalCar[]> => {
@@ -223,6 +228,9 @@ contextBridge.exposeInMainWorld(
             ipcRenderer.on(eventName, () => {
                 return callback();
             });
+        },
+        reopen: (callback: () => void): void => {
+            ipcRenderer.on("reopen", () => { return callback() });
         }
     }
 );

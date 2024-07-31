@@ -24,6 +24,9 @@ export interface openWindow {
     editCarCatalogWindow: () => Promise<void>;
 }
 
+export interface closeWindow {
+}
+
 export interface fetchJson {
     carCatalog: () => Promise<CarCatalog | unknown>;
     navigations: () => Promise<Navigations | unknown>;
@@ -74,6 +77,7 @@ export interface webSocket {
     updateReservationData: (callback: () => void) => number;
     updateRentalcar: (callback: () => void) => number;
     updateRentalCarStatus: (callback: () => void) => number;
+    reopen: (callback: () => void) => void;
 }
 
 export interface dialog {
@@ -97,6 +101,7 @@ declare global {
         systemTimezone: systemTimezone;
         login: login;
         openWindow: openWindow;
+        closeWindow: closeWindow;
         fetchJson: fetchJson;
         sqlSelect: sqlSelect;
         sqlInsert: sqlInsert;

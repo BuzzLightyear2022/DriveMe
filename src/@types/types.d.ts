@@ -1,5 +1,6 @@
 import { Datetime } from "aws-sdk/clients/costoptimizationhub"
 import { time } from "aws-sdk/clients/frauddetector"
+import { BrowserWindow } from "electron"
 
 export type Windows = {
     loginWindow: BrowserWindow | undefined,
@@ -8,7 +9,8 @@ export type Windows = {
     displayReservationWindow: BrowserWindow | undefined,
     rentalcarStatusHandlerWindow: BrowserWindow | undefined,
     loanerRentalReservationHandlerWindow: BrowserWindow | undefined,
-    reservationListWindow: BrowserWindow | undefined
+    reservationListWindow: BrowserWindow | undefined,
+    searchModalWindow: BrowserWindow | undefined
 }
 
 export type CarCatalog = {

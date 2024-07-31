@@ -1,4 +1,7 @@
 import { WindowHandler } from "./window_handler";
+import crypto from "crypto";
+import path from "path";
+import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config();
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -9,24 +12,45 @@ const serverHost: string = import.meta.env.VITE_EC2_SERVER_HOST as string;
 // @ts-ignore
 const port: string = import.meta.env.VITE_EC2_SERVER_PORT as string;
 
+const uuidFilePath: string = path.join(".", "driveme_client_uuid.txt");
+
 let reconnectInterval: number = 5000;
 let reconnectTimer: NodeJS.Timeout | null = null;
 
+const getClientUUID = (): string => {
+    if (fs.existsSync(uuidFilePath)) {
+        return fs.readFileSync(uuidFilePath, "utf-8");
+    } else {
+        const newUUID = crypto.randomUUID();
+        fs.writeFileSync(uuidFilePath, newUUID);
+        return newUUID;
+    }
+}
+
+let webSocket: WebSocket | null = null;
+
 export const connectWebSocket = async () => {
-    const webSocket = new WebSocket(`wss://${serverHost}:${port}`);
+    const clientId: string = getClientUUID();
+
+    if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+        console.log("WebSocket already connected");
+        return;
+    }
+
+    webSocket = new WebSocket(`wss://${serverHost}:${port}`);
 
     webSocket.onopen = () => {
         console.log("WebSocket is connected");
+
+        const message = JSON.stringify({ type: "register", clientId });
+        console.log("Sending message to server: ", message);
+        webSocket?.send(message);
 
         if (reconnectTimer) {
             clearInterval(reconnectTimer);
             reconnectTimer = null;
         }
     }
-
-    // webSocket.on("open", () => {
-    //     console.log("WebSocket connection established");
-    // });
 
     webSocket.onclose = (event: any) => {
         console.error(`WebSocket is closed. Recconect will be attempted in ${reconnectInterval / 1000} seconds.`);
@@ -38,20 +62,14 @@ export const connectWebSocket = async () => {
         }
     }
 
-    webSocket.on("message", async (message: string) => {
+    webSocket.onmessage = async (event: MessageEvent) => {
+        const message: string = event.data;
         const eventName: string = String(message);
 
         WindowHandler.windows.displayReservationWindow.send(eventName);
-    });
+    };
 
     webSocket.onerror = (error: any) => {
         console.error(error);
     }
-
-    // webSocket.on("close", (event: any) => {
-    //     console.error(`webSocket is closed. Recconect will be attempted in ${reconnectInterval / 1000}`, event);
-    //     setInterval(() => {
-    //         connectWebSocket();
-    //     }, reconnectInterval);
-    // });
 }

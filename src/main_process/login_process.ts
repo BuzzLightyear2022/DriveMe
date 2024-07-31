@@ -1,5 +1,5 @@
 import { ipcMain, dialog } from "electron";
-import axios, { AxiosResponse } from "axios";
+import { axios, AxiosResponse } from "./common_modules/axios_interceptor";
 
 import { WindowHandler } from "./window_handler";
 import { connectWebSocket } from "./websocket_handler";
@@ -25,8 +25,6 @@ const serverEndPoint = `https://${serverHost}:${serverPort}/login/getSessionData
 
             WindowHandler.windows.loginWindow.close();
         } catch (error: any) {
-            console.error(error);
-
             if (error.response) {
                 if (error.response.status === 401) {
                     dialog.showErrorBox("Authenticate Error", "ログインできません");

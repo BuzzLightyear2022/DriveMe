@@ -1,5 +1,6 @@
 import { ipcMain } from "electron";
-import axios, { AxiosResponse } from "axios";
+import { axios, AxiosResponse } from "./common_modules/axios_interceptor";
+// import axios, { AxiosResponse } from "axios";
 import dotenv from "dotenv";
 import { accessToken } from "./login_process";
 dotenv.config();

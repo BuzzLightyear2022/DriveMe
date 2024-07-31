@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import axios, { AxiosResponse } from "axios";
+import { axios, AxiosResponse } from "./common_modules/axios_interceptor";
 import FormData from "form-data";
 import { makeImageFileName } from "./common_modules/makeImageFIleName";
 import { LoanerRentalReservation, RentalCar, Reservation } from "../@types/types";

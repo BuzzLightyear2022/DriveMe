@@ -231,200 +231,205 @@ convertToKatakana(furiganaInput);
 
 (async () => {
     const crudArgs = await window.contextmenu.getCrudArgs();
-    const selectOptions: SelectOptions = await window.fetchJson.selectOptions();
-    const carCatalog: CarCatalog = await window.fetchJson.carCatalog();
 
-    if (selectOptions.branches) {
-        const branchNames: string[] = Object.keys(selectOptions.branches);
-        branchNames.forEach((branchName: string) => {
-            const branchOption: HTMLOptionElement = document.createElement("option");
-            branchOption.textContent = `${branchName}(${selectOptions.branches[branchName].phoneNumber})`;
-            branchOption.value = branchName;
-            salesBranchSelect.append(branchOption);
+    try {
+        const selectOptions: SelectOptions | undefined = await window.fetchJson.selectOptions();
+        const carCatalog: CarCatalog | undefined = await window.fetchJson.carCatalog();
 
-            const pickupLocationOption: HTMLOptionElement = document.createElement("option");
-            pickupLocationOption.textContent = branchName;
-            pickupLocationOption.value = branchName;
-            pickupLocationSelect.append(pickupLocationOption);
+        if (selectOptions && selectOptions.branches) {
+            const branchNames: string[] = Object.keys(selectOptions.branches);
+            branchNames.forEach((branchName: string) => {
+                const branchOption: HTMLOptionElement = document.createElement("option");
+                branchOption.textContent = `${branchName}(${selectOptions.branches[branchName].phoneNumber})`;
+                branchOption.value = branchName;
+                salesBranchSelect.append(branchOption);
 
-            const returnLocationOption: HTMLOptionElement = document.createElement("option");
-            returnLocationOption.textContent = branchName;
-            returnLocationOption.value = branchName;
-            returnLocationSelect.append(returnLocationOption);
-        });
-    }
+                const pickupLocationOption: HTMLOptionElement = document.createElement("option");
+                pickupLocationOption.textContent = branchName;
+                pickupLocationOption.value = branchName;
+                pickupLocationSelect.append(pickupLocationOption);
 
-    const staffMembers: string[] = selectOptions.staffMembers;
-    await asyncAppendOptionElements({ selectElement: orderHandlerSelect, appendedOptionStrings: staffMembers });
+                const returnLocationOption: HTMLOptionElement = document.createElement("option");
+                returnLocationOption.textContent = branchName;
+                returnLocationOption.value = branchName;
+                returnLocationSelect.append(returnLocationOption);
+            });
+        }
 
-    const orderSources: string[] = selectOptions.orderSources;
-    await asyncAppendOptionElements({ selectElement: orderSourceSelect, appendedOptionStrings: orderSources });
+        const staffMembers: string[] = selectOptions.staffMembers;
+        await asyncAppendOptionElements({ selectElement: orderHandlerSelect, appendedOptionStrings: staffMembers });
 
-    const orderSourceOtherOption: HTMLOptionElement = document.createElement("option");
-    orderSourceOtherOption.textContent = "その他";
-    orderSourceOtherOption.value = "other";
-    orderSourceSelect.append(orderSourceOtherOption);
+        const orderSources: string[] = selectOptions.orderSources;
+        await asyncAppendOptionElements({ selectElement: orderSourceSelect, appendedOptionStrings: orderSources });
 
-    if (carCatalog.rentalClasses) {
-        const rentalClasses: string[] = Object.keys(carCatalog.rentalClasses);
-        rentalClasses.forEach((rentalClass: string) => {
-            const rentalClassOption: HTMLOptionElement = document.createElement("option");
-            rentalClassOption.textContent = rentalClass;
-            rentalClassOption.value = rentalClass;
-            preferredRentalClassSelect.append(rentalClassOption);
-        });
-    }
+        const flightCarriers: string[] = selectOptions.flightCarriers;
+        await asyncAppendOptionElements({ selectElement: arrivalFlightCarrierSelect, appendedOptionStrings: flightCarriers });
+        await asyncAppendOptionElements({ selectElement: departureFlightCarrierSelect, appendedOptionStrings: flightCarriers });
 
-    const selectedRentalClass: string = preferredRentalClassSelect.value;
-    if (selectedRentalClass) {
-        const carModels: string[] = Object.keys(carCatalog.rentalClasses[selectedRentalClass]);
-        carModels.forEach((carModel: string) => {
-            const carModelOption: HTMLOptionElement = document.createElement("option");
-            carModelOption.textContent = carModel;
-            carModelOption.value = carModel;
-            preferredCarModelSelect.append(carModelOption);
-        });
-    }
-
-    const carModelNoneSpecificationOption = document.createElement("option");
-    carModelNoneSpecificationOption.textContent = "なし";
-    carModelNoneSpecificationOption.value = null;
-    preferredCarModelSelect.append(carModelNoneSpecificationOption);
-
-    const flightCarriers: string[] = selectOptions.flightCarriers;
-    await asyncAppendOptionElements({ selectElement: arrivalFlightCarrierSelect, appendedOptionStrings: flightCarriers });
-    await asyncAppendOptionElements({ selectElement: departureFlightCarrierSelect, appendedOptionStrings: flightCarriers });
-
-    preferredRentalClassSelect.addEventListener("change", () => {
-        while (preferredCarModelSelect.hasChildNodes()) {
-            preferredCarModelSelect.removeChild(preferredCarModelSelect.firstChild);
+        if (carCatalog && carCatalog.rentalClasses) {
+            const rentalClasses: string[] = Object.keys(carCatalog.rentalClasses);
+            rentalClasses.forEach((rentalClass: string) => {
+                const rentalClassOption: HTMLOptionElement = document.createElement("option");
+                rentalClassOption.textContent = rentalClass;
+                rentalClassOption.value = rentalClass;
+                preferredRentalClassSelect.append(rentalClassOption);
+            });
         }
 
         const selectedRentalClass: string = preferredRentalClassSelect.value;
-        const carModels: string[] = Object.keys(carCatalog.rentalClasses[selectedRentalClass]);
-        carModels.forEach((carModel: string) => {
-            const carModelOption: HTMLOptionElement = document.createElement("option");
-            carModelOption.textContent = carModel;
-            carModelOption.value = carModel;
-            preferredCarModelSelect.append(carModelOption);
-        });
+        if (selectedRentalClass) {
+            const carModels: string[] = Object.keys(carCatalog.rentalClasses[selectedRentalClass]);
+            carModels.forEach((carModel: string) => {
+                const carModelOption: HTMLOptionElement = document.createElement("option");
+                carModelOption.textContent = carModel;
+                carModelOption.value = carModel;
+                preferredCarModelSelect.append(carModelOption);
+            });
+        }
 
-        const newCarModelNoneSpecificationOption: HTMLOptionElement = document.createElement("option");
-        newCarModelNoneSpecificationOption.textContent = "なし";
-        newCarModelNoneSpecificationOption.value = null;
-        preferredCarModelSelect.append(newCarModelNoneSpecificationOption);
-    }, false);
-
-    switch (crudArgs.crudAction) {
-        case "create":
-            titleElement.textContent = "予約情報を入力してください";
-            submitButton.textContent = "予約確定";
-
-            scheduleBarColorInput.value = "#008000";
-
-            const now: Date = new Date();
-            const todayString: string = formatDateForInput({ dateObject: now });
-            receptionDateInput.value = todayString;
-
-            await rentalCarOptionsHandler({ rentalCarId: crudArgs.rentalCarId });
-            break;
-        case "update":
-            titleElement.textContent = "予約情報を更新します";
-
-            await populateFormInputs({ reservationId: crudArgs.reservationId, carCatalog: carCatalog });
-            submitButton.textContent = "変更確定";
-            break;
-        case "cancel":
-            const cancelCommentTextareaRow = (): HTMLDivElement => {
-                const rowDiv: HTMLDivElement = document.createElement("div");
-                rowDiv.className = "row";
-
-                const colDiv: HTMLDivElement = document.createElement("div");
-                colDiv.className = "col";
-
-                const formFloatingDiv: HTMLDivElement = document.createElement("div");
-                formFloatingDiv.className = "form-floating";
-
-                const cancelCommentTextarea: HTMLTextAreaElement = document.createElement("textarea");
-                cancelCommentTextarea.className = "form-control";
-                cancelCommentTextarea.id = "cancel-comment-textarea";
-
-                const label: HTMLLabelElement = document.createElement("label");
-                label.textContent = "キャンセル理由";
-
-                formFloatingDiv.append(cancelCommentTextarea, label);
-                colDiv.append(formFloatingDiv);
-                rowDiv.append(colDiv);
-
-                return rowDiv;
+        preferredRentalClassSelect.addEventListener("change", () => {
+            while (preferredCarModelSelect.hasChildNodes()) {
+                preferredCarModelSelect.removeChild(preferredCarModelSelect.firstChild);
             }
-            titleElement.textContent = "キャンセル理由を入力してください";
-            submitButton.remove();
 
-            await populateFormInputs({ reservationId: crudArgs.reservationId, carCatalog: carCatalog });
-            const inputElements: NodeListOf<HTMLInputElement> = document.querySelectorAll("input");
-            inputElements.forEach((inputElement: HTMLInputElement) => {
-                inputElement.disabled = true;
+            const selectedRentalClass: string = preferredRentalClassSelect.value;
+            const carModels: string[] = Object.keys(carCatalog.rentalClasses[selectedRentalClass]);
+            carModels.forEach((carModel: string) => {
+                const carModelOption: HTMLOptionElement = document.createElement("option");
+                carModelOption.textContent = carModel;
+                carModelOption.value = carModel;
+                preferredCarModelSelect.append(carModelOption);
             });
-            const selectElements: NodeListOf<HTMLSelectElement> = document.querySelectorAll("select");
-            selectElements.forEach((selectElement: HTMLSelectElement) => {
-                selectElement.disabled = true;
-            });
-            commentTextArea.disabled = true;
 
-            const newCancelCommentTextareaRow = cancelCommentTextareaRow();
-            titleElement.after(newCancelCommentTextareaRow);
+            const newCarModelNoneSpecificationOption: HTMLOptionElement = document.createElement("option");
+            newCarModelNoneSpecificationOption.textContent = "なし";
+            newCarModelNoneSpecificationOption.value = null;
+            preferredCarModelSelect.append(newCarModelNoneSpecificationOption);
+        }, false);
 
-            const cancelSubmitButton: HTMLButtonElement = document.createElement("button");
-            cancelSubmitButton.className = "btn btn-danger m-1";
-            cancelSubmitButton.id = "cancel-submit-button";
-            cancelSubmitButton.textContent = "予約キャンセル確定";
+        const orderSourceOtherOption: HTMLOptionElement = document.createElement("option");
+        orderSourceOtherOption.textContent = "その他";
+        orderSourceOtherOption.value = "other";
+        orderSourceSelect.append(orderSourceOtherOption);
 
-            newCancelCommentTextareaRow.after(cancelSubmitButton);
-
-            const hrElement: HTMLHRElement = document.createElement("hr");
-            cancelSubmitButton.after(hrElement);
-
-            break;
-    }
-
-    submitButton.addEventListener("click", async () => {
-        const reservation: Reservation = getSubmitData({ crudArgs: crudArgs });
+        const carModelNoneSpecificationOption = document.createElement("option");
+        carModelNoneSpecificationOption.textContent = "なし";
+        carModelNoneSpecificationOption.value = null;
+        preferredCarModelSelect.append(carModelNoneSpecificationOption);
 
         switch (crudArgs.crudAction) {
             case "create":
-                try {
-                    await window.sqlInsert.reservation(reservation);
-                } catch (error: unknown) {
-                    console.error(`Failed to invoke reservationData: ${error}`);
-                }
+                titleElement.textContent = "予約情報を入力してください";
+                submitButton.textContent = "予約確定";
+
+                scheduleBarColorInput.value = "#008000";
+
+                const now: Date = new Date();
+                const todayString: string = formatDateForInput({ dateObject: now });
+                receptionDateInput.value = todayString;
+
+                await rentalCarOptionsHandler({ rentalCarId: crudArgs.rentalCarId });
+                break;
             case "update":
+                titleElement.textContent = "予約情報を更新します";
+
+                await populateFormInputs({ reservationId: crudArgs.reservationId, carCatalog: carCatalog });
+                submitButton.textContent = "変更確定";
+                break;
+            case "cancel":
+                const cancelCommentTextareaRow = (): HTMLDivElement => {
+                    const rowDiv: HTMLDivElement = document.createElement("div");
+                    rowDiv.className = "row";
+
+                    const colDiv: HTMLDivElement = document.createElement("div");
+                    colDiv.className = "col";
+
+                    const formFloatingDiv: HTMLDivElement = document.createElement("div");
+                    formFloatingDiv.className = "form-floating";
+
+                    const cancelCommentTextarea: HTMLTextAreaElement = document.createElement("textarea");
+                    cancelCommentTextarea.className = "form-control";
+                    cancelCommentTextarea.id = "cancel-comment-textarea";
+
+                    const label: HTMLLabelElement = document.createElement("label");
+                    label.textContent = "キャンセル理由";
+
+                    formFloatingDiv.append(cancelCommentTextarea, label);
+                    colDiv.append(formFloatingDiv);
+                    rowDiv.append(colDiv);
+
+                    return rowDiv;
+                }
+                titleElement.textContent = "キャンセル理由を入力してください";
+                submitButton.remove();
+
+                await populateFormInputs({ reservationId: crudArgs.reservationId, carCatalog: carCatalog });
+                const inputElements: NodeListOf<HTMLInputElement> = document.querySelectorAll("input");
+                inputElements.forEach((inputElement: HTMLInputElement) => {
+                    inputElement.disabled = true;
+                });
+                const selectElements: NodeListOf<HTMLSelectElement> = document.querySelectorAll("select");
+                selectElements.forEach((selectElement: HTMLSelectElement) => {
+                    selectElement.disabled = true;
+                });
+                commentTextArea.disabled = true;
+
+                const newCancelCommentTextareaRow = cancelCommentTextareaRow();
+                titleElement.after(newCancelCommentTextareaRow);
+
+                const cancelSubmitButton: HTMLButtonElement = document.createElement("button");
+                cancelSubmitButton.className = "btn btn-danger m-1";
+                cancelSubmitButton.id = "cancel-submit-button";
+                cancelSubmitButton.textContent = "予約キャンセル確定";
+
+                newCancelCommentTextareaRow.after(cancelSubmitButton);
+
+                const hrElement: HTMLHRElement = document.createElement("hr");
+                cancelSubmitButton.after(hrElement);
+
+                break;
+        }
+
+        submitButton.addEventListener("click", async () => {
+            const reservation: Reservation = getSubmitData({ crudArgs: crudArgs });
+
+            switch (crudArgs.crudAction) {
+                case "create":
+                    try {
+                        await window.sqlInsert.reservation(reservation);
+                    } catch (error: unknown) {
+                        console.error(`Failed to invoke reservationData: ${error}`);
+                    }
+                case "update":
+                    try {
+                        await window.sqlUpdate.reservation(reservation);
+                    } catch (error: unknown) {
+                        console.error(`Failed to update reservationData: ${error}`)
+                    }
+            }
+        }, false);
+
+        const cancelSubmitButton: HTMLButtonElement = document.querySelector("#cancel-submit-button");
+        const cancelEventHandler = {
+            handleEvent: async () => {
+                const reservation: Reservation = getSubmitData({ crudArgs: crudArgs });
+                reservation.isCanceled = true;
+
+                const cancelCommentTextarea: HTMLTextAreaElement = document.querySelector("#cancel-comment-textarea");
+                const cancelComment: string = cancelCommentTextarea.value;
+                reservation.cancelComment = cancelComment;
+
                 try {
                     await window.sqlUpdate.reservation(reservation);
                 } catch (error: unknown) {
-                    console.error(`Failed to update reservationData: ${error}`)
+                    console.error(error);
                 }
-        }
-    }, false);
-
-    const cancelSubmitButton: HTMLButtonElement = document.querySelector("#cancel-submit-button");
-    const cancelEventHandler = {
-        handleEvent: async () => {
-            const reservation: Reservation = getSubmitData({ crudArgs: crudArgs });
-            reservation.isCanceled = true;
-
-            const cancelCommentTextarea: HTMLTextAreaElement = document.querySelector("#cancel-comment-textarea");
-            const cancelComment: string = cancelCommentTextarea.value;
-            reservation.cancelComment = cancelComment;
-
-            try {
-                await window.sqlUpdate.reservation(reservation);
-            } catch (error: unknown) {
-                console.error(error);
             }
         }
-    }
-    if (cancelSubmitButton) {
-        cancelSubmitButton.addEventListener("click", cancelEventHandler, false);
+        if (cancelSubmitButton) {
+            cancelSubmitButton.addEventListener("click", cancelEventHandler, false);
+        }
+    } catch (error: unknown) {
+        console.error(error);
     }
 })();

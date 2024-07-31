@@ -2,9 +2,7 @@ import { BrowserWindow, screen } from "electron";
 import path from "path";
 import { Windows } from "../@types/types";
 import { ContextmenuHandler } from "./contextmenu_handler";
-// import { accessToken } from "./login_process";
 import dotenv from "dotenv";
-// import { external } from "vite.base.config";
 dotenv.config();
 
 const openInExtendedDisplay = (targetWindow: BrowserWindow) => {
@@ -25,7 +23,8 @@ export class WindowHandler {
         displayReservationWindow: undefined,
         rentalcarStatusHandlerWindow: undefined,
         loanerRentalReservationHandlerWindow: undefined,
-        reservationListWindow: undefined
+        reservationListWindow: undefined,
+        searchModalWindow: undefined
     }
 
     static createLoginWindow = () => {
@@ -39,6 +38,8 @@ export class WindowHandler {
                 resizable: false
             }
         );
+
+        loginWindow.on("close", () => { WindowHandler.windows.loginWindow = undefined });
 
         loginWindow.menuBarVisible = false;
 
@@ -66,6 +67,8 @@ export class WindowHandler {
         ContextmenuHandler.displayScheduleBarMenu();
         ContextmenuHandler.displayLoanerRentalScheduleBarMenu();
         ContextmenuHandler.displayVehicleItemMenu();
+
+        displayReservationWindow.on("close", () => { WindowHandler.windows.displayReservationWindow = undefined });
 
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
             openInExtendedDisplay(displayReservationWindow);
@@ -188,7 +191,7 @@ export class WindowHandler {
                 win.webContents.send("contextmenu:getRentalCarId", args.rentalcarId);
             });
 
-            win.on("closed", () => {
+            win.on("close", () => {
                 WindowHandler.windows.rentalcarStatusHandlerWindow = undefined;
             });
 
@@ -211,7 +214,9 @@ export class WindowHandler {
                 }
             });
 
-            win.on("closed", () => {
+            win.maximize();
+
+            win.on("close", () => {
                 WindowHandler.windows.reservationListWindow = undefined;
             });
 

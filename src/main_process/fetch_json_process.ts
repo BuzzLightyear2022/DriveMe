@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import axios, { AxiosResponse } from "axios";
+import { axios, AxiosResponse } from "./common_modules/axios_interceptor";
 import { CarCatalog } from "../@types/types";
 import { accessToken } from "./login_process";
 import dotenv from "dotenv";
