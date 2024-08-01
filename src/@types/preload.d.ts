@@ -74,10 +74,11 @@ export interface contextmenu {
 }
 
 export interface webSocket {
-    updateReservationData: (callback: () => void) => number;
-    updateRentalcar: (callback: () => void) => number;
-    updateRentalCarStatus: (callback: () => void) => number;
-    reopen: (callback: () => void) => void;
+    // updateReservationData: (callback: () => void) => number;
+    // updateRentalcar: (callback: () => void) => number;
+    // updateRentalCarStatus: (callback: () => void) => number;
+    // reopen: (callback: () => void) => void;
+    wssUpdate: (callback: () => void) => Promise<void>;
 }
 
 export interface dialog {

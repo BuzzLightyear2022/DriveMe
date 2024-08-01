@@ -31,8 +31,6 @@ const serverEndPoint = `https://${serverHost}:${serverPort}/login/getSessionData
                 } else if (error.response.status === 403) {
                     dialog.showErrorBox("Authenticate Error", "サーバー管理者に連絡してください");
                 }
-            } else {
-                dialog.showErrorBox("Connection Error", "サーバー管理者に連絡してください");
             }
         }
     });

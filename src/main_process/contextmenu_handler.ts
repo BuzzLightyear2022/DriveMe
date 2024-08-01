@@ -96,6 +96,7 @@ export class ContextmenuHandler {
 
     static displayScheduleBarMenu = () => {
         ipcMain.on("contextmenu:schedule-bar", (event: Electron.IpcMainEvent, reservationId: string) => {
+            console.log("contextmenu_handler.ts", "L99");
             const menuTemplate = Menu.buildFromTemplate([
                 {
                     label: "予約変更",
@@ -151,7 +152,7 @@ export class ContextmenuHandler {
                 }
             ]);
 
-            menuTemplate.popup(WindowHandler.windows.displayReservationWindow);
+            menuTemplate.popup();
         });
     }
 }

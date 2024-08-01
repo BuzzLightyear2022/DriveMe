@@ -314,9 +314,10 @@ const handleSynchronousScroll = () => {
 const calendarUpdater = async () => {
     const rentalCarItemsContainer: HTMLDivElement = document.querySelector("#rental-car-items-container");
     const visualScheduleContainer: HTMLDivElement = document.querySelector("#visual-schedule-container");
+    const dateContainer: HTMLDivElement = document.querySelector("#date-container");
 
     const visualScheduleContainerScrollTop: number = visualScheduleContainer.scrollTop;
-    const visualScheduleContainerScrollLeft: number = visualScheduleContainer.scrollLeft;
+    const dateContainerScrollLeft: number = dateContainer.scrollLeft;
 
     while (rentalCarItemsContainer.firstChild) {
         rentalCarItemsContainer.removeChild(rentalCarItemsContainer.firstChild);
@@ -334,7 +335,7 @@ const calendarUpdater = async () => {
     await rentalCarStatusHandler({ rentalCars: rentalCars });
 
     visualScheduleContainer.scrollTop = visualScheduleContainerScrollTop;
-    visualScheduleContainer.scrollLeft = visualScheduleContainerScrollLeft;
+    dateContainer.scrollLeft = dateContainerScrollLeft;
 }
 
 const calendarInitializer = async () => {
@@ -361,8 +362,5 @@ const calendarInitializer = async () => {
     await calendarInitializer();
     rentalClassSelect.addEventListener("change", calendarUpdater, false);
 
-    window.webSocket.updateReservationData(calendarUpdater);
-    window.webSocket.updateRentalCarStatus(calendarUpdater);
-    window.webSocket.updateRentalcar(calendarUpdater);
-    window.webSocket.reopen(calendarInitializer);
+    await window.webSocket.wssUpdate(calendarUpdater);
 })();

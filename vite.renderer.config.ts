@@ -22,7 +22,8 @@ export default defineConfig((env) => {
           rentalCar_handler: resolve(__dirname, "html", "rentalcar_handler.html"),
           rentalcar_status_handler: resolve(__dirname, "html", "rentalcar_status_handler.html"),
           reservation_handler: resolve(__dirname, "html", "reservation_handler.html"),
-          loaner_rental_handler: resolve(__dirname, "html", "loaner_rental_handler.html")
+          loaner_rental_handler: resolve(__dirname, "html", "loaner_rental_handler.html"),
+          reservation_list: resolve(__dirname, "html", "reservation_list.html")
         }
       }
     },

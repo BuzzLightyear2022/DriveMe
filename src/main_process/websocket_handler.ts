@@ -1,3 +1,4 @@
+import { BrowserWindow } from "electron";
 import { WindowHandler } from "./window_handler";
 import crypto from "crypto";
 import path from "path";
@@ -66,7 +67,13 @@ export const connectWebSocket = async () => {
         const message: string = event.data;
         const eventName: string = String(message);
 
-        WindowHandler.windows.displayReservationWindow.send(eventName);
+        const displayReservationWindow: BrowserWindow = WindowHandler.windows.displayReservationWindow;
+
+        if (displayReservationWindow && displayReservationWindow.webContents) {
+            displayReservationWindow.webContents.send("event-name", eventName);
+        } else {
+            console.error("displayReservationWindow or its webContents is not defined");
+        }
     };
 
     webSocket.onerror = (error: any) => {

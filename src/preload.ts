@@ -4,13 +4,13 @@
 import { contextBridge, ipcRenderer } from "electron";
 import {
     CarCatalog,
-    RentalCar,
-    Navigations,
-    LicensePlate,
-    Reservation,
     CarLocation,
+    LicensePlate,
+    LoanerRentalReservation,
+    Navigations,
+    RentalCar,
     RentalCarStatus,
-    LoanerRentalReservation
+    Reservation
 } from "./@types/types";
 // import { generateUniqueId } from "./renderer_process/common_modules/common_modules";
 
@@ -207,31 +207,38 @@ contextBridge.exposeInMainWorld(
 
 contextBridge.exposeInMainWorld(
     "webSocket",
+    // {
+    //     updateReservationData: (callback: () => void): void => {
+    //         const eventName: string = "wssUpdate:reservationData";
+
+    //         ipcRenderer.on(eventName, () => {
+    //             return callback();
+    //         });
+    //     },
+    //     updateRentalcar: (callback: () => void) => {
+    //         const eventName: string = "wssUpdate:rentalcar";
+
+    //         ipcRenderer.on(eventName, () => {
+    //             return callback();
+    //         });
+    //     },
+    //     updateRentalCarStatus: (callback: () => void) => {
+    //         const eventName: string = "wssUpdate:rentalCarStatus";
+
+    //         ipcRenderer.on(eventName, () => {
+    //             return callback();
+    //         });
+    //     },
+    //     reopen: (callback: () => void): void => {
+    //         ipcRenderer.on("reopen", () => { return callback() });
+    //     },
     {
-        updateReservationData: (callback: () => void): void => {
-            const eventName: string = "wssUpdate:reservationData";
-
-            ipcRenderer.on(eventName, () => {
-                return callback();
+        wssUpdate: (callback: (eventName: string) => void) => {
+            ipcRenderer.on("event-name", (event, eventName) => {
+                callback(eventName);
             });
-        },
-        updateRentalcar: (callback: () => void) => {
-            const eventName: string = "wssUpdate:rentalcar";
-
-            ipcRenderer.on(eventName, () => {
-                return callback();
-            });
-        },
-        updateRentalCarStatus: (callback: () => void) => {
-            const eventName: string = "wssUpdate:rentalCarStatus";
-
-            ipcRenderer.on(eventName, () => {
-                return callback();
-            });
-        },
-        reopen: (callback: () => void): void => {
-            ipcRenderer.on("reopen", () => { return callback() });
         }
+
     }
 );
 

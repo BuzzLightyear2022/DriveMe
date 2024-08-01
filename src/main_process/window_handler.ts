@@ -214,20 +214,21 @@ export class WindowHandler {
                 }
             });
 
-            win.maximize();
-
             win.on("close", () => {
                 WindowHandler.windows.reservationListWindow = undefined;
             });
 
             if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+                openInExtendedDisplay(win);
                 win.webContents.openDevTools();
+                
                 win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/reservation_list.html`);
                 WindowHandler.windows.reservationListWindow = win;
             } else {
                 win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/reservation_list.html`));
                 WindowHandler.windows.reservationListWindow = win;
             }
+             win.maximize();
         }
     }
 }
