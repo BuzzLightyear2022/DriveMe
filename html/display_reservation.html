@@ -8,6 +8,7 @@
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self' https://cdn.jsdelivr.net/; connect-src 'self' https://holidays-jp.github.io/; img-src 'self' * data:">
     <link rel="stylesheet" href="../src/css/display_reservation.css">
+    <link rel="stylesheet" href="@bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 </head>
 
@@ -37,7 +38,8 @@
         </div>
     </div>
 
-    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="@bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="../src/renderer_process/display_reservation/display_reservation.ts"></script>
 </body>
 

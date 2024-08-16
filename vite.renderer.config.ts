@@ -23,7 +23,9 @@ export default defineConfig((env) => {
           rentalcar_status_handler: resolve(__dirname, "html", "rentalcar_status_handler.html"),
           reservation_handler: resolve(__dirname, "html", "reservation_handler.html"),
           loaner_rental_handler: resolve(__dirname, "html", "loaner_rental_handler.html"),
-          reservation_list: resolve(__dirname, "html", "reservation_list.html")
+          reservation_list: resolve(__dirname, "html", "reservation_list.html"),
+          add_user: resolve(__dirname, "html", "add_user.html"),
+          verify_mfa: resolve(__dirname, "html", "verify_mfa.html")
         }
       }
     },
@@ -31,7 +33,8 @@ export default defineConfig((env) => {
     resolve: {
       preserveSymlinks: true,
       alias: {
-        "@": resolve(__dirname, "src")
+        "@": resolve(__dirname, "src"),
+        "@bootstrap": resolve(__dirname, "node_modules/bootstrap/dist")
       }
     },
     clearScreen: false,

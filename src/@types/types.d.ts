@@ -10,7 +10,9 @@ export type Windows = {
     rentalcarStatusHandlerWindow: BrowserWindow | undefined,
     loanerRentalReservationHandlerWindow: BrowserWindow | undefined,
     reservationListWindow: BrowserWindow | undefined,
-    searchModalWindow: BrowserWindow | undefined
+    searchModalWindow: BrowserWindow | undefined,
+    addUserWindow: BrowserWindow | undefined,
+    verifyMfaWindow: BrowserWindow | undefined
 }
 
 export type CarCatalog = {

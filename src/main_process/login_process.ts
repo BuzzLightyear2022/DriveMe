@@ -13,25 +13,36 @@ const serverPort: string = import.meta.env.VITE_EC2_SERVER_PORT;
 
 const serverEndPoint = `https://${serverHost}:${serverPort}/login/getSessionData`;
 
-(async () => {
-    ipcMain.handle("login:getSessionData", async (event, data) => {
+const userAuthentication = async () => {
+    const serverEndPoint = `https://${serverHost}:${serverPort}/login/userAuthentication`;
+
+    ipcMain.handle("login:userAuthentication", async (event, data) => {
         try {
-            const response: AxiosResponse = await axios.post(serverEndPoint, data);
-            accessToken = response.data;
+            const resonse: AxiosResponse = await axios.post(serverEndPoint, data);
 
-            WindowHandler.createDisplayReservationWindow();
 
-            connectWebSocket();
+        } catch (error) {
 
-            WindowHandler.windows.loginWindow.close();
-        } catch (error: any) {
-            if (error.response) {
-                if (error.response.status === 401) {
-                    dialog.showErrorBox("Authenticate Error", "ログインできません");
-                } else if (error.response.status === 403) {
-                    dialog.showErrorBox("Authenticate Error", "サーバー管理者に連絡してください");
-                }
-            }
         }
     });
-})();
+}
+
+// (async () => {
+//     ipcMain.handle("login:getSessionData", async (event, data) => {
+//         try {
+//             const response: AxiosResponse = await axios.post(serverEndPoint, data);
+
+//             WindowHandler.createVerifyMfaWindow();
+
+//             WindowHandler.windows.loginWindow.close();
+//         } catch (error: any) {
+//             if (error.response) {
+//                 if (error.response.status === 401) {
+//                     dialog.showErrorBox("Authenticate Error", "ログインできません");
+//                 } else if (error.response.status === 403) {
+//                     dialog.showErrorBox("Authenticate Error", "サーバー管理者に連絡してください");
+//                 }
+//             }
+//         }
+//     });
+// })();

@@ -79,4 +79,11 @@ export const connectWebSocket = async () => {
     webSocket.onerror = (error: any) => {
         console.error(error);
     }
+
+    setInterval(() => {
+        if (webSocket?.readyState === WebSocket.closed) {
+            console.log("WebSocket is not connected. Attempting to reconnect...");
+            connectWebSocket();
+        }
+    }, reconnectInterval);
 }

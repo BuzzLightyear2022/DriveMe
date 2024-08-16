@@ -24,7 +24,9 @@ export class WindowHandler {
         rentalcarStatusHandlerWindow: undefined,
         loanerRentalReservationHandlerWindow: undefined,
         reservationListWindow: undefined,
-        searchModalWindow: undefined
+        searchModalWindow: undefined,
+        addUserWindow: undefined,
+        verifyMfaWindow: undefined
     }
 
     static createLoginWindow = () => {
@@ -58,7 +60,8 @@ export class WindowHandler {
     static createDisplayReservationWindow = () => {
         const displayReservationWindow: BrowserWindow = new BrowserWindow({
             webPreferences: {
-                preload: WindowHandler.preloadScript
+                preload: WindowHandler.preloadScript,
+                nodeIntegration: false
             },
         });
 
@@ -77,11 +80,12 @@ export class WindowHandler {
             WindowHandler.windows.displayReservationWindow = displayReservationWindow;
 
             displayReservationWindow.webContents.openDevTools();
-            displayReservationWindow.maximize();
         } else {
             displayReservationWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/display_reservation.html`));
             WindowHandler.windows.displayReservationWindow = displayReservationWindow;
         }
+        displayReservationWindow.maximize();
+        displayReservationWindow.webContents.openDevTools();
     }
 
     static createRentalcarHandlerWindow = (args?: { rentalcarId?: string, crudAction: string }): void => {
@@ -210,7 +214,7 @@ export class WindowHandler {
         if (!WindowHandler.windows.reservationListWindow) {
             const win: BrowserWindow = new BrowserWindow({
                 webPreferences: {
-                    preload: WindowHandler.preloadScript
+                    preload: WindowHandler.preloadScript,
                 }
             });
 
@@ -221,14 +225,67 @@ export class WindowHandler {
             if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
                 openInExtendedDisplay(win);
                 win.webContents.openDevTools();
-                
+
                 win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/reservation_list.html`);
                 WindowHandler.windows.reservationListWindow = win;
             } else {
                 win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/reservation_list.html`));
                 WindowHandler.windows.reservationListWindow = win;
             }
-             win.maximize();
+            win.maximize();
+            win.webContents.openDevTools();
+        }
+    }
+
+    static createAddUserWindow = (): void => {
+        if (!WindowHandler.windows.addUserWindow) {
+            const win: BrowserWindow = new BrowserWindow({
+                webPreferences: {
+                    preload: WindowHandler.preloadScript
+                }
+            });
+
+            win.on("close", () => {
+                WindowHandler.windows.addUserWindow = undefined;
+            });
+
+            if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+                openInExtendedDisplay(win);
+                win.webContents.openDevTools();
+
+                win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/add_user.html`);
+                WindowHandler.windows.addUserWindow = win;
+            } else {
+                win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/add_user.html`));
+                WindowHandler.windows.addUserWindow = win;
+            }
+
+            win.webContents.openDevTools();
+        }
+    }
+
+    static createVerifyMfaWindow = () => {
+        if (!WindowHandler.windows.verifyMfaWindow) {
+            const win: BrowserWindow = new BrowserWindow({
+                webPreferences: {
+                    preload: WindowHandler.preloadScript
+                }
+            });
+
+            win.on("close", () => {
+                WindowHandler.windows.verifyMfaWindow = undefined;
+            });
+
+            if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+                openInExtendedDisplay(win);
+                win.webContents.openDevTools();
+
+                win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/html/verify_mfa.html`);
+                WindowHandler.windows.verifyMfaWindow = win;
+            } else {
+                win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/html/verify_mfa.html`));
+                WindowHandler.windows.verifyMfaWindow = win;
+            }
         }
     }
 }

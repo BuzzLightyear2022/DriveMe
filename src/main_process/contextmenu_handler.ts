@@ -39,6 +39,18 @@ export class ContextmenuHandler {
                 ]
             },
             {
+                label: "ユーザー管理",
+                submenu: [
+                    {
+                        label: "ユーザー追加",
+                        click: () => WindowHandler.createAddUserWindow()
+                    },
+                    {
+                        label: "パスワード変更"
+                    }
+                ]
+            },
+            {
                 label: "表示",
                 submenu: [
                     {
