@@ -11,10 +11,20 @@ export interface systemTimezone {
 }
 
 export interface login {
-    getSessionData: (args: {
-        username: string,
-        password: string
-    }) => Promise<void>;
+    getSessionData: () => Promise<void>;
+    userAuthentication: (args: { username: string, password: string }) => Primise<void>;
+    getUserData: () => Promise<{
+        message: string,
+        userId: string,
+        mfaEnabled: boolean
+    }>;
+    getMFASecret: (args: { userId: string }) => Promise<any>;
+    verifyMFAToken: (args: {
+        userId: string,
+        MFAToken: string,
+        isMFASetup: boolean,
+        isFinalStep: boolean
+    }) => Promise<any>;
 }
 
 export interface openWindow {
@@ -22,9 +32,11 @@ export interface openWindow {
     reservationInputWindow: () => Promise<void>;
     displayReservationWindow: () => Promise<void>;
     editCarCatalogWindow: () => Promise<void>;
+    loginWindow: () => Promise<void>;
 }
 
 export interface closeWindow {
+    verifyMFAWindow: () => Promise<void>;
 }
 
 export interface fetchJson {

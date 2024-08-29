@@ -10,7 +10,7 @@ const handleEvent = {
         const username: string = usernameInput.value;
         const password: string = passwordInput.value;
 
-        await window.login.getSessionData({ username: username, password: password });
+        await window.login.userAuthentication({ username: username, password: password });
     }
 }
 

@@ -38,11 +38,41 @@ contextBridge.exposeInMainWorld("systemTimezone", {
 });
 
 contextBridge.exposeInMainWorld(
-    "login", {
-    getSessionData: async (args: { username: string, password: string }) => {
-        return await ipcRenderer.invoke("login:getSessionData", args);
+    "login",
+    {
+        getSessionData: async (args: { username: string, password: string }) => {
+            return await ipcRenderer.invoke("login:getSessionData", args);
+        },
+        userAuthentication: async (args: { username: string, password: string }) => {
+            return await ipcRenderer.invoke("login:userAuthentication", args);
+        },
+        getUserData: async () => {
+            return new Promise((resolve, reject) => {
+                ipcRenderer.on("login:getUserData", (event, userData: {
+                    message: string,
+                    userId: string,
+                    mfaEnabled: boolean
+                }) => {
+                    if (userData) {
+                        resolve(userData);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        },
+        getMFASecret: async (args: { userId: string }) => {
+            return await ipcRenderer.invoke("login:generateMFASecret", args);
+        },
+        verifyMFAToken: async (args: {
+            userId: string,
+            MFAToken: string,
+            isMFASetup: boolean,
+            isFinalStep: boolean
+        }) => {
+            return await ipcRenderer.invoke("login:verifyMFAToken", args);
+        }
     }
-}
 );
 
 contextBridge.exposeInMainWorld(
@@ -77,13 +107,20 @@ contextBridge.exposeInMainWorld(
         },
         editCarCatalogWindow: (): void => {
             ipcRenderer.send("openWindow:editCarCatalogWindow");
+        },
+        loginWindow: (): void => {
+            ipcRenderer.send("openWindow:loginWindow");
         }
     }
 );
 
 contextBridge.exposeInMainWorld(
     "closeWindow",
-    {}
+    {
+        verifyMFAWindow: (): void => {
+            ipcRenderer.send("closeWindow:verifyMFAWindow");
+        }
+    }
 );
 
 contextBridge.exposeInMainWorld(

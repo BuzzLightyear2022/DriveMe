@@ -1,4 +1,4 @@
-import { BrowserWindow, screen } from "electron";
+import { ipcMain, BrowserWindow, screen } from "electron";
 import path from "path";
 import { Windows } from "../@types/types";
 import { ContextmenuHandler } from "./contextmenu_handler";
@@ -264,12 +264,16 @@ export class WindowHandler {
         }
     }
 
-    static createVerifyMfaWindow = () => {
+    static createVerifyMfaWindow = (args: { userData: any }) => {
         if (!WindowHandler.windows.verifyMfaWindow) {
             const win: BrowserWindow = new BrowserWindow({
                 webPreferences: {
                     preload: WindowHandler.preloadScript
                 }
+            });
+
+            win.webContents.on("dom-ready", () => {
+                win.webContents.send("login:getUserData", args.userData);
             });
 
             win.on("close", () => {

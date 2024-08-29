@@ -11,21 +11,53 @@ const serverHost: string = import.meta.env.VITE_EC2_SERVER_HOST;
 // @ts-ignore
 const serverPort: string = import.meta.env.VITE_EC2_SERVER_PORT;
 
-const serverEndPoint = `https://${serverHost}:${serverPort}/login/getSessionData`;
-
-const userAuthentication = async () => {
+ipcMain.handle("login:userAuthentication", async (event, data) => {
     const serverEndPoint = `https://${serverHost}:${serverPort}/login/userAuthentication`;
 
-    ipcMain.handle("login:userAuthentication", async (event, data) => {
-        try {
-            const resonse: AxiosResponse = await axios.post(serverEndPoint, data);
+    try {
+        const response: AxiosResponse = await axios.post(serverEndPoint, data);
 
-
-        } catch (error) {
-
+        WindowHandler.windows.loginWindow.close();
+        WindowHandler.createVerifyMfaWindow({ userData: response.data });
+    } catch (error: any) {
+        if (error.response) {
+            console.log(error.response.status);
+            if (error.response.status === 401) {
+                dialog.showErrorBox("Authenticate Error", "ログインできません");
+            } else if (error.response.status === 403) {
+                dialog.showErrorBox("Authenticate Error", "サーバー管理者に連絡してください");
+            }
         }
-    });
-}
+    }
+});
+
+ipcMain.handle("login:generateMFASecret", async (event, data) => {
+    const serverEndPoint = `https://${serverHost}:${serverPort}/login/generateMFASecret`;
+
+    try {
+        const response: AxiosResponse = await axios.post(serverEndPoint, data);
+        return response.data;
+    } catch (error: any) {
+        console.error(error);
+    }
+});
+
+ipcMain.handle("login:verifyMFAToken", async (event, data) => {
+    const serverEndPoint = `https://${serverHost}:${serverPort}/login/verifyMFAToken`;
+
+    try {
+        const response: AxiosResponse = await axios.post(serverEndPoint, data);
+        if (response.data.isMFASetup && response.data.isFinalStep) {
+            WindowHandler.windows.verifyMfaWindow.close();
+            WindowHandler.createLoginWindow();
+            dialog.showMessageBox(WindowHandler.windows.loginWindow, { message: "MFAが有効化されました\nログインしてください" });
+        }
+        return response.data;
+    } catch (error: any) {
+        console.error(error);
+        return { success: false, message: "MFA verification failed" };
+    }
+});
 
 // (async () => {
 //     ipcMain.handle("login:getSessionData", async (event, data) => {
