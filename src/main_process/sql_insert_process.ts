@@ -1,7 +1,7 @@
-import { ipcMain } from "electron";
+import { ipcMain, dialog } from "electron";
 import { axios, AxiosResponse } from "./common_modules/axios_interceptor";
 import FormData from "form-data";
-import { RentalCar, Reservation, RentalCarStatus, LoanerRentalReservation } from "../@types/types";
+import { RentalCar, Reservation, RentalCarStatus, LoanerRentalReservation, UserData } from "../@types/types";
 import { makeImageFileName } from "./common_modules";
 import { accessToken } from "./login_process";
 import { WindowHandler } from "./window_handler";
@@ -140,6 +140,37 @@ const port: string = import.meta.env.VITE_EC2_SERVER_PORT;
                 WindowHandler.windows.loanerRentalReservationHandlerWindow.close();
             }
         } catch (error: unknown) {
+            console.error(error);
+        }
+    });
+})();
+
+(async () => {
+    ipcMain.handle("sqlInsert:user", async (event: Electron.IpcMainEvent, args: {
+        userData: UserData
+    }) => {
+        console.log("sql_insert_process.ts L152: ", args);
+        const serverEndPoint = `https://${serverHost}:${port}/sqlInsert/user`;
+        const userData: FormData = new FormData();
+        userData.append("userData", JSON.stringify(args.userData));
+
+        try {
+            const response: AxiosResponse = await axios.post(serverEndPoint, args, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": accessToken
+                },
+                withCredentials: true
+            });
+
+            if (response.status === 200) {
+                dialog.showMessageBox({ title: "ユーザー登録完了", message: "新しいユーザーでログインを試行して、速やかにMFAを有効化してください" });
+                if (WindowHandler.windows.addUserWindow) {
+                    WindowHandler.windows.addUserWindow.close();
+                }
+            }
+        } catch (error: unknown) {
+            dialog.showErrorBox("error", "ユーザーの追加に失敗しました");
             console.error(error);
         }
     });

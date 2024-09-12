@@ -29,7 +29,7 @@ export class WindowHandler {
         verifyMfaWindow: undefined
     }
 
-    static createLoginWindow = () => {
+    static createLoginWindow = (args: { act: "login" | "addUser", username?: string }) => {
         const loginWindow: BrowserWindow = new BrowserWindow(
             {
                 width: 300,
@@ -41,6 +41,9 @@ export class WindowHandler {
             }
         );
 
+        loginWindow.webContents.on("dom-ready", () => {
+            loginWindow.webContents.send("login:getAct", args);
+        });
         loginWindow.on("close", () => { WindowHandler.windows.loginWindow = undefined });
 
         loginWindow.menuBarVisible = false;
@@ -264,7 +267,14 @@ export class WindowHandler {
         }
     }
 
-    static createVerifyMfaWindow = (args: { userData: any }) => {
+    static createVerifyMfaWindow = (args: {
+        userData: {
+            message: string,
+            userId: string,
+            mfaEnabled: boolean
+        }, addUser?: boolean
+    }) => {
+        console.log("window_handler L271: ", args);
         if (!WindowHandler.windows.verifyMfaWindow) {
             const win: BrowserWindow = new BrowserWindow({
                 webPreferences: {
@@ -273,7 +283,7 @@ export class WindowHandler {
             });
 
             win.webContents.on("dom-ready", () => {
-                win.webContents.send("login:getUserData", args.userData);
+                win.webContents.send("login:getUserData", args);
             });
 
             win.on("close", () => {

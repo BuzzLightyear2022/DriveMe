@@ -21,5 +21,5 @@ export const handleConnectionError = () => {
     dialog.showErrorBox("Connection Error", "サーバーが応答しません\nサーバー管理者に連絡してください");
 
     WindowHandler.windows.displayReservationWindow.close();
-    WindowHandler.createLoginWindow();
+    WindowHandler.createLoginWindow({ act: "login" });
 }

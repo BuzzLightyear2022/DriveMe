@@ -1,9 +1,7 @@
 import { replaceFullWidthNumToHalfWidthNum } from "./common_modules/replace_fullwidthnum_to_halfwidthnum";
 
-const windowContainer: HTMLDivElement = document.querySelector("#window-container");
 const titleElement: HTMLElement = document.querySelector("#title");
 const MFAForm: HTMLFormElement = document.querySelector("#mfa-form");
-const submitDiv: HTMLDivElement = document.querySelector("#submit-div");
 const submitButton = document.querySelector("#submit-button");
 
 const explainText: HTMLElement = document.createElement("h2");
@@ -64,7 +62,8 @@ const handleSecondStep = async (userId: string) => {
 }
 
 (async () => {
-    const userData = await window.login.getUserData();
+    const args = await window.login.getUserData();
+    const userData = args.userData;
 
     if (!userData.mfaEnabled) {
         await initializeMFASetup(userData.userId);
@@ -86,14 +85,13 @@ const handleSecondStep = async (userId: string) => {
             event.preventDefault();
 
             const mfaToken: string = mfaTokenInput.value;
-            const MFAResult = await window.login.verifyMFAToken({
+            await window.login.verifyMFAToken({
                 userId: userData.userId,
                 MFAToken: mfaToken,
                 isMFASetup: false,
-                isFinalStep: false
+                isFinalStep: false,
+                addUser: args.addUser
             });
-
-            console.log(MFAResult);
         }, false);
     }
 })();

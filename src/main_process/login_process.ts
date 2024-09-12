@@ -13,15 +13,20 @@ const serverPort: string = import.meta.env.VITE_EC2_SERVER_PORT;
 
 ipcMain.handle("login:userAuthentication", async (event, data) => {
     const serverEndPoint = `https://${serverHost}:${serverPort}/login/userAuthentication`;
+    console.log("login_process L16: ", data);
 
     try {
         const response: AxiosResponse = await axios.post(serverEndPoint, data);
+        console.log("login_process L20: ", response.data);
 
         WindowHandler.windows.loginWindow.close();
-        WindowHandler.createVerifyMfaWindow({ userData: response.data });
+        if (data.addUser) {
+            WindowHandler.createVerifyMfaWindow({ userData: response.data, addUser: true });
+        } else {
+            WindowHandler.createVerifyMfaWindow({ userData: response.data });
+        }
     } catch (error: any) {
         if (error.response) {
-            console.log(error.response.status);
             if (error.response.status === 401) {
                 dialog.showErrorBox("Authenticate Error", "ログインできません");
             } else if (error.response.status === 403) {
@@ -44,37 +49,39 @@ ipcMain.handle("login:generateMFASecret", async (event, data) => {
 
 ipcMain.handle("login:verifyMFAToken", async (event, data) => {
     const serverEndPoint = `https://${serverHost}:${serverPort}/login/verifyMFAToken`;
+    console.log("login_process L52: ", data);
 
     try {
         const response: AxiosResponse = await axios.post(serverEndPoint, data);
+
         if (response.data.isMFASetup && response.data.isFinalStep) {
             WindowHandler.windows.verifyMfaWindow.close();
-            WindowHandler.createLoginWindow();
+            WindowHandler.createLoginWindow({ act: "login" });
             dialog.showMessageBox(WindowHandler.windows.loginWindow, { message: "MFAが有効化されました\nログインしてください" });
+        } else if (!response.data.isMFASetup && data.addUser) {
+            accessToken = response.data.accessToken;
+            connectWebSocket();
+
+            WindowHandler.windows.verifyMfaWindow.close();
+            WindowHandler.createAddUserWindow();
+        } else if (!response.data.isMFASetup) {
+            accessToken = response.data.accessToken;
+            connectWebSocket();
+
+            WindowHandler.windows.verifyMfaWindow.close();
+            WindowHandler.createDisplayReservationWindow();
         }
+
         return response.data;
     } catch (error: any) {
         console.error(error);
+
+        if (error.response.status === 401) {
+            dialog.showErrorBox("Authenticate Error", "もう一度お試しください");
+        } else if (error.response.status === 403) {
+            dialog.showErrorBox("Authenticate Error", "サーバー管理者に連絡してください");
+        }
+
         return { success: false, message: "MFA verification failed" };
     }
 });
-
-// (async () => {
-//     ipcMain.handle("login:getSessionData", async (event, data) => {
-//         try {
-//             const response: AxiosResponse = await axios.post(serverEndPoint, data);
-
-//             WindowHandler.createVerifyMfaWindow();
-
-//             WindowHandler.windows.loginWindow.close();
-//         } catch (error: any) {
-//             if (error.response) {
-//                 if (error.response.status === 401) {
-//                     dialog.showErrorBox("Authenticate Error", "ログインできません");
-//                 } else if (error.response.status === 403) {
-//                     dialog.showErrorBox("Authenticate Error", "サーバー管理者に連絡してください");
-//                 }
-//             }
-//         }
-//     });
-// })();

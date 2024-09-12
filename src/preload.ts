@@ -10,7 +10,8 @@ import {
     Navigations,
     RentalCar,
     RentalCarStatus,
-    Reservation
+    Reservation,
+    UserData
 } from "./@types/types";
 // import { generateUniqueId } from "./renderer_process/common_modules/common_modules";
 
@@ -43,16 +44,12 @@ contextBridge.exposeInMainWorld(
         getSessionData: async (args: { username: string, password: string }) => {
             return await ipcRenderer.invoke("login:getSessionData", args);
         },
-        userAuthentication: async (args: { username: string, password: string }) => {
+        userAuthentication: async (args: { username: string, password: string, addUser?: boolean }) => {
             return await ipcRenderer.invoke("login:userAuthentication", args);
         },
         getUserData: async () => {
             return new Promise((resolve, reject) => {
-                ipcRenderer.on("login:getUserData", (event, userData: {
-                    message: string,
-                    userId: string,
-                    mfaEnabled: boolean
-                }) => {
+                ipcRenderer.on("login:getUserData", (event, userData) => {
                     if (userData) {
                         resolve(userData);
                     } else {
@@ -68,9 +65,17 @@ contextBridge.exposeInMainWorld(
             userId: string,
             MFAToken: string,
             isMFASetup: boolean,
-            isFinalStep: boolean
+            isFinalStep: boolean,
+            addUser?: boolean
         }) => {
             return await ipcRenderer.invoke("login:verifyMFAToken", args);
+        },
+        getAct: async (): Promise<{ act: "login" | "addUser" }> => {
+            return new Promise((resolve, reject) => {
+                ipcRenderer.on("login:getAct", (event: Electron.IpcRendererEvent, args) => {
+                    resolve(args);
+                });
+            });
         }
     }
 );
@@ -176,6 +181,9 @@ contextBridge.exposeInMainWorld(
         },
         loanerRentalReservation: async (args: { loanerRentalReservation: LoanerRentalReservation }) => {
             return await ipcRenderer.invoke("sqlInsert:loanerRentalReservation", args);
+        },
+        user: async (args: { userData: UserData }) => {
+            return await ipcRenderer.invoke("sqlInsert:user", args);
         }
     }
 );
@@ -244,31 +252,6 @@ contextBridge.exposeInMainWorld(
 
 contextBridge.exposeInMainWorld(
     "webSocket",
-    // {
-    //     updateReservationData: (callback: () => void): void => {
-    //         const eventName: string = "wssUpdate:reservationData";
-
-    //         ipcRenderer.on(eventName, () => {
-    //             return callback();
-    //         });
-    //     },
-    //     updateRentalcar: (callback: () => void) => {
-    //         const eventName: string = "wssUpdate:rentalcar";
-
-    //         ipcRenderer.on(eventName, () => {
-    //             return callback();
-    //         });
-    //     },
-    //     updateRentalCarStatus: (callback: () => void) => {
-    //         const eventName: string = "wssUpdate:rentalCarStatus";
-
-    //         ipcRenderer.on(eventName, () => {
-    //             return callback();
-    //         });
-    //     },
-    //     reopen: (callback: () => void): void => {
-    //         ipcRenderer.on("reopen", () => { return callback() });
-    //     },
     {
         wssUpdate: (callback: (eventName: string) => void) => {
             ipcRenderer.on("event-name", (event, eventName) => {

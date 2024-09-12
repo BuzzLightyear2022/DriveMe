@@ -196,3 +196,9 @@ export type SelectOptions = {
     orderSources: string[],
     flightCarriers: string[]
 }
+
+export type UserData = {
+    username: string,
+    password: string,
+    role: "admin" | "employee" | "part-time"
+}

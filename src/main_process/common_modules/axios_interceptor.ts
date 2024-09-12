@@ -12,7 +12,6 @@ instance.interceptors.response.use(
                 handleTokenExpired();
             }
         } else if (error.request) {
-            console.log("error L15: ", error.message);
             if (typeof error.message === "string" && error.message.includes("ECONNREFUSED")) {
                 handleConnectionError();
             } else {

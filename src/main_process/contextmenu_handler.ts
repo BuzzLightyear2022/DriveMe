@@ -1,8 +1,15 @@
 import { ipcMain, Menu } from "electron";
 import { WindowHandler } from "./window_handler";
+import { getRoleFromToken } from "./common_modules/get_role_from_token";
+import { getUsernameFromToken } from "./common_modules/get_username_from_token";
+
+import { accessToken } from "./login_process";
 
 export class ContextmenuHandler {
     static displayMenubarMenu = () => {
+        const username = getUsernameFromToken(accessToken);
+        const userRole = getRoleFromToken(accessToken);
+
         const menuTemplate = Menu.buildFromTemplate([
             {
                 label: "ファイル"
@@ -43,7 +50,8 @@ export class ContextmenuHandler {
                 submenu: [
                     {
                         label: "ユーザー追加",
-                        click: () => WindowHandler.createAddUserWindow()
+                        enabled: userRole === "admin",
+                        click: () => WindowHandler.createLoginWindow({ act: "addUser", username: username })
                     },
                     {
                         label: "パスワード変更"

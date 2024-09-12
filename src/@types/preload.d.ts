@@ -12,19 +12,24 @@ export interface systemTimezone {
 
 export interface login {
     getSessionData: () => Promise<void>;
-    userAuthentication: (args: { username: string, password: string }) => Primise<void>;
+    userAuthentication: (args: { username: string, password: string, addUser?: boolean }) => Primise<void>;
     getUserData: () => Promise<{
-        message: string,
-        userId: string,
-        mfaEnabled: boolean
+        userData: {
+            message: string,
+            userId: string,
+            mfaEnabled: boolean
+        },
+        addUser?: boolean
     }>;
     getMFASecret: (args: { userId: string }) => Promise<any>;
     verifyMFAToken: (args: {
         userId: string,
         MFAToken: string,
         isMFASetup: boolean,
-        isFinalStep: boolean
+        isFinalStep: boolean,
+        addUser?: boolean
     }) => Promise<any>;
+    getAct: () => Promise<{ act: "login" | "addUser", username?: string }>;
 }
 
 export interface openWindow {
@@ -65,6 +70,7 @@ export interface sqlInsert {
     reservation: (reservation: Reservation) => Promise<string>;
     rentalCarStatus: (args: { rentalCarStatus: RentalCarStatus }) => Promise<void>;
     loanerRentalReservation: (args: { loanerRentalReservation: LoanerRentalReservation }) => Promise<void>;
+    user: (args: { userData: UserData }) => Promise<void>;
 }
 
 export interface sqlUpdate {
